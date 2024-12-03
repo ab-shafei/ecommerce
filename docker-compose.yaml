@@ -1,0 +1,48 @@
+services:
+  app:
+    depends_on:
+      - postgresdb
+    build: .
+    container_name: ecommerce-api-app
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+    environment:
+      - DB_HOST=postgresdb
+      - DB_USER=$POSTGRESDB_USER
+      - DB_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
+      - DB_NAME=$POSTGRESDB_DATABASE
+      - DB_PORT=$POSTGRESDB_DOCKER_PORT
+      - DATABASE_URL=$DATABASE_URL
+    stdin_open: true
+    tty: true
+
+  postgresdb:
+    image: postgres:14-alpine
+    container_name: postgresdb
+    restart: unless-stopped
+    env_file: ./.env
+    volumes:
+      - db:/var/lib/postgres
+    environment:
+      - POSTGRES_USER=$POSTGRESDB_USER
+      - POSTGRES_PASSWORD=$POSTGRESDB_ROOT_PASSWORD
+      - POSTGRES_DB=$POSTGRESDB_DATABASE
+    ports:
+      - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=$PGADMIN_DEFAULT_EMAIL
+      - PGADMIN_DEFAULT_PASSWORD=$PGADMIN_DEFAULT_PASSWORD
+    ports:
+      - "6001:80"
+    depends_on:
+      - postgresdb
+
+volumes:
+  db:
