@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
     env_file: ./.env
     volumes:
-      - db:/var/lib/postgres
+      - db:/var/lib/postgressql/data
     environment:
       - POSTGRES_USER=$POSTGRESDB_USER
       - POSTGRES_PASSWORD=$POSTGRESDB_ROOT_PASSWORD

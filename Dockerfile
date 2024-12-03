@@ -13,7 +13,7 @@ RUN npx tsc
 
 # Copy entrypoint script
 
-EXPOSE 5000
+EXPOSE 4000
 
 # Use the entrypoint script
 CMD ["npm", "start"]
