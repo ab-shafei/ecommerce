@@ -4,7 +4,6 @@ import {
   login,
   forgetPassword,
   resetPassword,
-  // verifyPhoneNumber,
 } from "../controllers/authController";
 
 const router = Router();

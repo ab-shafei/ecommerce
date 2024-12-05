@@ -3,9 +3,9 @@ import { AppError } from "./AppError";
 
 export const errorHandler = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   console.error(err); // Log the error details for debugging purposes
 

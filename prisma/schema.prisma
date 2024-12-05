@@ -29,3 +29,21 @@ enum Role {
   CUSTOMER
   ADMIN
 }
+
+model Category {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  images   String[]
+  products Product[]
+}
+
+model Product {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  images     String[]
+  color      String
+  size       String
+  price      Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+}

@@ -86,7 +86,9 @@ export const loginUser = async (email: string, password: string) => {
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) throw new AppError(400, "Invalid credentials");
 
-  const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+  const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+    expiresIn: "365d",
+  });
   return { token, user };
 };
 
@@ -111,8 +113,8 @@ export const forgetUserPassword = async (email: string) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.GOOGLE_EMAIL,
+      pass: process.env.GOOGLE_EMAIL_PASSWORD,
     },
   });
 

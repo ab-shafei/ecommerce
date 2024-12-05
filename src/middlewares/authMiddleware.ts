@@ -10,7 +10,7 @@ interface AuthenticatedRequest extends Request {
 
 export const authenticateJWT = (
   req: AuthenticatedRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   const token = req.header("Authorization")?.split(" ")[1];
