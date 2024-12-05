@@ -15,7 +15,7 @@ import path from "path";
 const app = express();
 
 // Middleware
-app.use(express.static(path.join(__dirname, " ")));
+app.use(express.static(path.join(__dirname, "../uploads")));
 app.use(express.json());
 app.use(
   cors({
