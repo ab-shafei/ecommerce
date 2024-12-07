@@ -22,3 +22,7 @@ export const validateName = (name: string): boolean => {
 export const validatePhoneNumber = (phoneNumber: string): boolean => {
   return phoneRegex.test(phoneNumber);
 };
+
+export const validatePrice = (price: number): boolean => {
+  return !isNaN(price);
+};

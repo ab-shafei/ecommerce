@@ -57,16 +57,18 @@ export const addCategory = async (
   const category = await prisma.category.create({ data });
   if (images) {
     const imageNames = await resizeAndSaveCategoryImages(images);
-    await prisma.category.update({
+    const updatedCategory = await prisma.category.update({
       where: { id: category.id },
       data: { images: imageNames },
     });
+    return updatedCategory;
   }
+  return category;
 };
 
 export const modifyCategory = async (
   id: string,
-  data: { name: string },
+  data: { name?: string },
   images: Express.Multer.File[] | undefined
 ) => {
   const category = await prisma.category.findUnique({

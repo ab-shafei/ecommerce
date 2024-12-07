@@ -7,14 +7,24 @@ import {
   updateProduct,
 } from "../controllers/productController";
 import { authenticateJWT } from "../middlewares/authMiddleware";
-import { uploadProductImages } from "../services/productService";
+import { uploadMultipleImages } from "../middlewares/uploadImageMiddleare";
 
 const router = Router();
 
 router.get("/", authenticateJWT, getAllProducts);
 router.get("/:id", authenticateJWT, getProductById);
-router.post("/", authenticateJWT, uploadProductImages, createProduct);
-router.put("/:id", authenticateJWT, uploadProductImages, updateProduct);
+router.post(
+  "/",
+  authenticateJWT,
+  uploadMultipleImages([{ name: "images" }]),
+  createProduct
+);
+router.put(
+  "/:id",
+  authenticateJWT,
+  uploadMultipleImages([{ name: "images" }]),
+  updateProduct
+);
 router.delete("/:id", authenticateJWT, deleteProduct);
 
 export default router;
