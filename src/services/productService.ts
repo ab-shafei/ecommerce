@@ -4,6 +4,9 @@ import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
+import { Decimal } from "@prisma/client/runtime/library";
+
+const SERVER_URL = process.env.SERVER_URL;
 
 export const resizeAndSaveProductImages = async (
   images: Express.Multer.File[]
@@ -23,7 +26,7 @@ export const resizeAndSaveProductImages = async (
           .jpeg({ quality: 95 })
           .toFile(`uploads/product/${imageName}`);
 
-        imageNames.push(imageName);
+        imageNames.push(`${SERVER_URL}/api/images/product/${imageName}`);
       })
     );
     return imageNames;
@@ -47,7 +50,7 @@ export const addProduct = async (
     name: string;
     color: string;
     size: string;
-    price: number;
+    price: Decimal;
     categoryId: string;
   },
   images: Express.Multer.File[] | undefined
@@ -56,7 +59,13 @@ export const addProduct = async (
     where: { name: data.name },
   });
   if (existingProduct) {
-    throw new AppError(409, "Product already exists");
+    throw new AppError(409, "Product name already exists");
+  }
+  const categoryExist = await prisma.category.findUnique({
+    where: { id: data.categoryId },
+  });
+  if (!categoryExist) {
+    throw new AppError(409, "Product category doesn't exists");
   }
   const product = await prisma.product.create({ data });
   if (images) {
@@ -76,7 +85,7 @@ export const modifyProduct = async (
     name?: string;
     color?: string;
     size?: string;
-    price?: number;
+    price?: Decimal;
     categoryId?: string;
   },
   images: Express.Multer.File[] | undefined
@@ -86,6 +95,14 @@ export const modifyProduct = async (
   });
   if (!product) {
     throw new AppError(404, "Product not found");
+  }
+  if (data.categoryId) {
+    const categoryExist = await prisma.category.findUnique({
+      where: { id: data.categoryId },
+    });
+    if (!categoryExist) {
+      throw new AppError(409, "Product category doesn't exists");
+    }
   }
   if (images) {
     const imageNames = await resizeAndSaveProductImages(images);

@@ -5,30 +5,30 @@ import { AppError } from "../middlewares/AppError";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 
+const SERVER_URL = process.env.SERVER_URL;
+
 export const resizeAndSaveCategoryImages = async (
   images: Express.Multer.File[]
 ) => {
   if (images) {
-    const imageNames: string[] = [];
+    const imageURLs: string[] = [];
     const uploadDir = path.join(__dirname, "../../uploads/category");
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     await Promise.all(
       images.map(async (img, index) => {
-        const imageName = `category-${uuidv4()}-${Date.now()}-${
-          index + 1
-        }.jpeg`;
+        const imageURL = `category-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
 
         await sharp(img.buffer)
           .toFormat("jpeg")
           .jpeg({ quality: 95 })
-          .toFile(`uploads/category/${imageName}`);
+          .toFile(`uploads/category/${imageURL}`);
 
-        imageNames.push(imageName);
+        imageURLs.push(`${SERVER_URL}/api/images/category/${imageURL}`);
       })
     );
-    return imageNames;
+    return imageURLs;
   }
 };
 

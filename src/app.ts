@@ -8,8 +8,11 @@ import morgan from "morgan";
 import "dotenv/config";
 
 import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
 import productRoutes from "./routes/productRoutes";
+import cartRoutes from "./routes/cartRoutes";
+
 import path from "path";
 
 const app = express();
@@ -31,8 +34,10 @@ app.use(morgan("combined"));
 app.use("/api/auth", authRoutes);
 
 // Routes
+app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 // Error Handling
 app.use(errorHandler);

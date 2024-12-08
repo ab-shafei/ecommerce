@@ -6,9 +6,8 @@ import {
   modifyProduct,
   removeProduct,
 } from "../services/productService";
-import { validatePrice } from "../utils/validate";
 import { AppError } from "../middlewares/AppError";
-
+import { Decimal } from "@prisma/client/runtime/library";
 export const getAllProducts = async (
   _req: Request,
   res: Response,
@@ -47,11 +46,11 @@ export const createProduct = async (
       [fieldname: string]: Express.Multer.File[];
     };
 
-    // validat price
-    const parsedPrice = parseInt(price, 10);
-    const isPriceValid = validatePrice(parsedPrice);
-
-    if (!isPriceValid) {
+    // Convert price to Decimal
+    let decimalPrice;
+    try {
+      decimalPrice = new Decimal(price); // Handles precise conversions
+    } catch (error) {
       throw new AppError(400, "Price must be valid number");
     }
     const product = await addProduct(
@@ -59,7 +58,7 @@ export const createProduct = async (
         name,
         color,
         size,
-        price: parsedPrice,
+        price: decimalPrice,
         categoryId,
       },
       images
@@ -82,20 +81,21 @@ export const updateProduct = async (
       [fieldname: string]: Express.Multer.File[];
     };
 
-    // validat price
-    const parsedPrice = parseInt(price, 10);
-    const isPriceValid = validatePrice(parsedPrice);
-
-    if (!isPriceValid) {
+    // Convert price to Decimal
+    let decimalPrice;
+    try {
+      decimalPrice = new Decimal(price); // Handles precise conversions
+    } catch (error) {
       throw new AppError(400, "Price must be valid number");
     }
+
     const product = await modifyProduct(
       id,
       {
         name,
         color,
         size,
-        price: parsedPrice,
+        price: decimalPrice,
         categoryId,
       },
       images

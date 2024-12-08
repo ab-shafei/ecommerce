@@ -1,16 +1,15 @@
 import { Router } from "express";
-import {
-  getAllUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
-} from "../controllers/userController";
+import { updateUser, deleteUser } from "../controllers/userController";
+import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.get("/", getAllUsers);
-router.get("/:id", getUserById);
-router.put("/:id", updateUser);
-router.delete("/:id", deleteUser);
+router.put(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles("ADMIN", "CUSTOMER"),
+  updateUser
+);
+router.delete("/:id", authenticateJWT, authorizeRoles("ADMIN"), deleteUser);
 
 export default router;
