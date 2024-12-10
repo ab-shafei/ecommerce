@@ -5,6 +5,8 @@ services:
     build: .
     container_name: ecommerce-api-app
     restart: unless-stopped
+    volumes:
+      - /root/apps/ecommerceApi/uploads:/app/uploads
     env_file: ./.env
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
