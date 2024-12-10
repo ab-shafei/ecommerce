@@ -74,6 +74,8 @@ model Product {
 
 model Cart {
   id Int @id @default(autoincrement())
+  totalCartPrice Decimal
+  totalPriceAfterDiscount Decimal
 
   customerId String     @unique
   customer   User       @relation(fields: [customerId], references: [id])
@@ -85,7 +87,8 @@ model Cart {
 
 model CartItem {
   id       Int @id @default(autoincrement())
-  quantity Int
+  quantity Int @default(1)
+  totalCartItemPrice Decimal
 
   cartId    Int
   cart      Cart    @relation(fields: [cartId], references: [id])

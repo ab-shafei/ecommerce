@@ -1,6 +1,12 @@
 import { NextFunction, Response } from "express";
 
-import { fetchUserCart } from "../services/cartService";
+import {
+  addToCart,
+  clearCartItems,
+  fetchUserCart,
+  removeFromCart,
+  updateQuantity,
+} from "../services/cartService";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
 export const getUserCart = async (
@@ -17,64 +23,74 @@ export const getUserCart = async (
   }
 };
 
-// export const addToUserCart = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { customerId } = req.query as { [key: string]: string };
+export const addProductToCart = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user!.id;
 
-//     const { name } = req.body;
-//     const { images } = req.files as {
-//       [fieldname: string]: Express.Multer.File[];
-//     };
+    const { productId, quantity } = req.body;
 
-//     const cart = await addToCart({
-//       name,
-//     });
-//     res.status(201).json(cart);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    const cart = await addToCart(userId, {
+      productId,
+      quantity,
+    });
+    res.status(201).json(cart);
+  } catch (error) {
+    next(error);
+  }
+};
 
-// export const updateCart = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { customerId } = req.query as { [key: string]: string };
+export const updateProductQuantity = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const customerId = req.user!.id;
+    const { productId } = req.params;
+    const { quantity } = req.body;
 
-//     const { name } = req.body;
-//     const { images } = req.files as {
-//       [fieldname: string]: Express.Multer.File[];
-//     };
+    const cart = await updateQuantity(customerId, {
+      productId,
+      quantity,
+    });
 
-//     const cart = await modifyCart(
-//       {
-//         name,
-//       },
-//       images
-//     );
-//     res.status(200).json(cart);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    res.status(200).json(cart);
+  } catch (error) {
+    next(error);
+  }
+};
 
-// export const deleteFromCart = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { id } = req.params;
+export const deleteProductFromCart = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const customerId = req.user!.id;
+    const { productId } = req.params;
 
-//     await removeFromCart(id);
-//     res.status(204).send();
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    await removeFromCart(customerId, { productId });
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const clearCart = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const customerId = req.user!.id;
+
+    await clearCartItems(customerId);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};

@@ -14,6 +14,7 @@ import productRoutes from "./routes/productRoutes";
 import cartRoutes from "./routes/cartRoutes";
 
 import path from "path";
+import { notFound } from "./controllers/notFoundController";
 
 const app = express();
 
@@ -41,5 +42,7 @@ app.use("/api/cart", cartRoutes);
 
 // Error Handling
 app.use(errorHandler);
+
+app.all("*", notFound);
 
 export default app;
