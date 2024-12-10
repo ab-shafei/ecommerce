@@ -8,6 +8,8 @@ COPY package.json .
 COPY package-lock.json .
 COPY tsconfig.json .
 
+RUN apk add --no-cache openssl bash
+
 RUN npm install
 RUN npx tsc
 
