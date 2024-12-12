@@ -56,12 +56,17 @@ model Category {
 }
 
 model Product {
-  id         String   @id @default(uuid())
-  name       String
-  images     String[]
-  color      String
-  size       String
-  price      Decimal
+  id    String   @id @default(uuid())
+  name  String
+  color String[]
+  size  String[]
+
+  price              Decimal
+  priceAfterDiscount Decimal?
+
+  images            String[]
+  diamensionsImages String[]
+
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
 
@@ -73,8 +78,8 @@ model Product {
 }
 
 model Cart {
-  id Int @id @default(autoincrement())
-  totalCartPrice Decimal?
+  id                      Int      @id @default(autoincrement())
+  totalCartPrice          Decimal?
   totalPriceAfterDiscount Decimal?
 
   customerId String     @unique
@@ -86,8 +91,8 @@ model Cart {
 }
 
 model CartItem {
-  id       Int @id @default(autoincrement())
-  quantity Int @default(1)
+  id                 Int      @id @default(autoincrement())
+  quantity           Int      @default(1)
   totalCartItemPrice Decimal?
 
   cartId    Int
