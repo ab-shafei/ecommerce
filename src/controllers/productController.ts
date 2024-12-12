@@ -105,12 +105,13 @@ export const updateProduct = async (
 
     // Convert price to Decimal
     let decimalPrice;
-    try {
-      decimalPrice = new Decimal(price); // Handles precise conversions
-    } catch (error) {
-      throw new AppError(400, "Price must be valid number");
+    if (price) {
+      try {
+        decimalPrice = new Decimal(price); // Handles precise conversions
+      } catch (error) {
+        throw new AppError(400, "Price must be valid number");
+      }
     }
-
     const product = await modifyProduct(id, {
       name,
       color,
