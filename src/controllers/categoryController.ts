@@ -5,7 +5,11 @@ import {
   fetchCategoryById,
   modifyCategory,
   removeCategory,
+  uploadImages,
 } from "../services/categoryService";
+import { AppError } from "../middlewares/AppError";
+
+const allowedUploadTypes = ["images"];
 
 export const getAllCategorys = async (
   _req: Request,
@@ -42,17 +46,36 @@ export const createCategory = async (
 ) => {
   try {
     const { name } = req.body;
-    const { images } = req.files as {
-      [fieldname: string]: Express.Multer.File[];
-    };
 
-    const category = await addCategory(
-      {
-        name,
-      },
-      images
-    );
+    const category = await addCategory({
+      name,
+    });
     res.status(201).json(category);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadCategoryImages = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.params;
+  const { uploadType } = req.query;
+  const { files } = req.files as {
+    [fieldname: string]: Express.Multer.File[];
+  };
+
+  if (typeof uploadType !== "string") {
+    throw new AppError(400, "Upload type must be a string");
+  }
+  const isAllowedUploadType = allowedUploadTypes.includes(uploadType);
+  if (!isAllowedUploadType) throw new AppError(400, "Upload type not allowed");
+
+  try {
+    await uploadImages({ id, uploadType, files });
+    res.status(200).send();
   } catch (error) {
     next(error);
   }
@@ -66,17 +89,10 @@ export const updateCategory = async (
   try {
     const { id } = req.params;
     const { name } = req.body;
-    const { images } = req.files as {
-      [fieldname: string]: Express.Multer.File[];
-    };
 
-    const category = await modifyCategory(
-      id,
-      {
-        name,
-      },
-      images
-    );
+    const category = await modifyCategory(id, {
+      name,
+    });
     res.status(200).json(category);
   } catch (error) {
     next(error);

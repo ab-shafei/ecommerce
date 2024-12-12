@@ -8,28 +8,29 @@ import { v4 as uuidv4 } from "uuid";
 const SERVER_URL = process.env.SERVER_URL;
 
 export const resizeAndSaveCategoryImages = async (
-  images: Express.Multer.File[]
+  imagePrefix: string,
+  files: Express.Multer.File[]
 ) => {
-  if (images) {
-    const imageURLs: string[] = [];
-    const uploadDir = path.join(__dirname, "../../uploads/category");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    await Promise.all(
-      images.map(async (img, index) => {
-        const imageURL = `category-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
-
-        await sharp(img.buffer)
-          .toFormat("jpeg")
-          .jpeg({ quality: 95 })
-          .toFile(`uploads/category/${imageURL}`);
-
-        imageURLs.push(`${SERVER_URL}/api/images/category/${imageURL}`);
-      })
-    );
-    return imageURLs;
+  const imageURLs: string[] = [];
+  const uploadDir = path.join(__dirname, "../../uploads/category");
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
+  await Promise.all(
+    files.map(async (img, index) => {
+      const imageURL = `${imagePrefix}-${uuidv4()}-${Date.now()}-${
+        index + 1
+      }.jpeg`;
+
+      await sharp(img.buffer)
+        .toFormat("jpeg")
+        .jpeg({ quality: 95 })
+        .toFile(`uploads/category/${imageURL}`);
+
+      imageURLs.push(`${SERVER_URL}/api/images/category/${imageURL}`);
+    })
+  );
+  return { imageURLs };
 };
 
 export const fetchAllCategorys = async () => {
@@ -44,10 +45,7 @@ export const fetchCategoryById = async (id: string) => {
   return category;
 };
 
-export const addCategory = async (
-  data: { name: string },
-  images: Express.Multer.File[] | undefined
-) => {
+export const addCategory = async (data: { name: string }) => {
   const existingCategory = await prisma.category.findFirst({
     where: { name: data.name },
   });
@@ -55,34 +53,45 @@ export const addCategory = async (
     throw new AppError(409, "Category already exists");
   }
   const category = await prisma.category.create({ data });
-  if (images) {
-    const imageNames = await resizeAndSaveCategoryImages(images);
-    const updatedCategory = await prisma.category.update({
-      where: { id: category.id },
-      data: { images: imageNames },
-    });
-    return updatedCategory;
-  }
+
   return category;
 };
 
-export const modifyCategory = async (
-  id: string,
-  data: { name?: string },
-  images: Express.Multer.File[] | undefined
-) => {
+export const uploadImages = async ({
+  id,
+  uploadType,
+  files,
+}: {
+  id: string;
+  uploadType: string;
+  files: Express.Multer.File[];
+}) => {
   const category = await prisma.category.findUnique({
     where: { id },
   });
   if (!category) {
     throw new AppError(404, "Category not found");
   }
-  if (images) {
-    const imageNames = await resizeAndSaveCategoryImages(images);
-    await prisma.category.update({
-      where: { id: category.id },
-      data: { images: imageNames },
-    });
+  switch (uploadType) {
+    case "images":
+      const { imageURLs } = await resizeAndSaveCategoryImages(
+        "category",
+        files
+      );
+      return await prisma.category.update({
+        where: { id },
+        data: { images: imageURLs },
+      });
+    default:
+  }
+};
+
+export const modifyCategory = async (id: string, data: { name?: string }) => {
+  const category = await prisma.category.findUnique({
+    where: { id },
+  });
+  if (!category) {
+    throw new AppError(404, "Category not found");
   }
   return await prisma.category.update({ where: { id }, data });
 };

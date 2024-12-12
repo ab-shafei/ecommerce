@@ -12,7 +12,7 @@ export const resizeAndSaveProductImages = async (
   imagePrefix: string,
   files: Express.Multer.File[]
 ) => {
-  const imageNames: string[] = [];
+  const imageURLs: string[] = [];
   const uploadDir = path.join(__dirname, "../../uploads/product");
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -28,11 +28,11 @@ export const resizeAndSaveProductImages = async (
         .jpeg({ quality: 95 })
         .toFile(`uploads/product/${imageName}`);
 
-      imageNames.push(`${SERVER_URL}/api/images/product/${imageName}`);
+      imageURLs.push(`${SERVER_URL}/api/images/product/${imageName}`);
     })
   );
 
-  return { imageNames };
+  return { imageURLs };
 };
 
 export const fetchAllProducts = async () => {
@@ -99,20 +99,19 @@ export const uploadImages = async ({
   }
   switch (uploadType) {
     case "images":
-      const { imageNames } = await resizeAndSaveProductImages(
-        "product-",
+      const { imageURLs } = await resizeAndSaveProductImages("product", files);
+      return await prisma.product.update({
+        where: { id },
+        data: { images: imageURLs },
+      });
+    case "diamensionsImages":
+      const { imageURLs: diamensionsImages } = await resizeAndSaveProductImages(
+        "product-diamensions",
         files
       );
       return await prisma.product.update({
         where: { id },
-        data: { images: imageNames },
-      });
-    case "diamensionsImages":
-      const { imageNames: diamensionsImages } =
-        await resizeAndSaveProductImages("product-diamensions", files);
-      return await prisma.product.update({
-        where: { id },
-        data: { diamensionsImages: diamensionsImages },
+        data: { diamensionsImages },
       });
     default:
   }
