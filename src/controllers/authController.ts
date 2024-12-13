@@ -4,7 +4,10 @@ import {
   loginUser,
   forgetUserPassword,
   resetUserPassword,
+  changePassword,
 } from "../services/authService";
+import { AppError } from "../middlewares/AppError";
+import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
 export const register = async (
   req: Request,
@@ -58,6 +61,24 @@ export const resetPassword = async (
   try {
     const message = await resetUserPassword(token, password);
     res.json(message);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changeUserPassword = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.user!;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const user = await changePassword(id, {
+      oldPassword,
+      newPassword,
+    });
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }

@@ -12,6 +12,7 @@ import userRoutes from "./routes/userRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
 import productRoutes from "./routes/productRoutes";
 import cartRoutes from "./routes/cartRoutes";
+import searchRoutes from "./routes/searchRoutes";
 
 import path from "path";
 import { notFound } from "./controllers/notFoundController";
@@ -39,6 +40,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/search", searchRoutes);
 
 // Error Handling
 app.use(errorHandler);
