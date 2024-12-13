@@ -45,7 +45,7 @@ export const createProduct = async (
   next: NextFunction
 ) => {
   try {
-    const { name, color, size, price, categoryId } = req.body;
+    const { name, color, size, price, inStock, categoryId } = req.body;
     console.log(req.body);
 
     // Convert price to Decimal
@@ -100,8 +100,15 @@ export const updateProduct = async (
 ) => {
   try {
     const { id } = req.params;
-    const { name, color, size, price, priceAfterDiscount, categoryId } =
-      req.body;
+    const {
+      name,
+      color,
+      size,
+      price,
+      priceAfterDiscount,
+      inStock,
+      categoryId,
+    } = req.body;
 
     // Convert price to Decimal
     let decimalPrice;
@@ -117,6 +124,7 @@ export const updateProduct = async (
       color,
       size,
       price: decimalPrice,
+      inStock,
       priceAfterDiscount,
       categoryId,
     });

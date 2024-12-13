@@ -56,11 +56,11 @@ model Category {
 }
 
 model Product {
-  id    String   @id @default(uuid())
-  name  String
-  color String[]
-  size  String[]
-
+  id                 String   @id @default(uuid())
+  name               String
+  color              String[]
+  size               String[]
+  inStock            Boolean  @default(true)
   price              Decimal
   priceAfterDiscount Decimal?
 

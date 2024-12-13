@@ -124,6 +124,7 @@ export const modifyProduct = async (
     color?: string[];
     size?: string[];
     price?: Decimal;
+    inStock?: boolean;
     priceAfterDiscount?: Decimal;
     categoryId?: string;
   }
