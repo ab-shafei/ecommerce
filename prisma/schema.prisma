@@ -35,7 +35,7 @@ model Profile {
   avatarUrl String?
 
   userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -68,8 +68,8 @@ model Product {
   images            String[]
   diamensionsImages String[]
 
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?
 
   cartItem  CartItem[]
   orderItem OrderItem[]
@@ -80,11 +80,11 @@ model Product {
 
 model Cart {
   id                      Int      @id @default(autoincrement())
-  totalCartPrice          Decimal?
-  totalPriceAfterDiscount Decimal?
+  cartTotalPrice          Decimal?
+  cartTotalPriceAfterDiscount Decimal?
 
   customerId String     @unique
-  customer   User       @relation(fields: [customerId], references: [id])
+  customer   User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
   items      CartItem[]
 
   createdAt DateTime @default(now())
@@ -93,13 +93,15 @@ model Cart {
 
 model CartItem {
   id                 Int      @id @default(autoincrement())
-  quantity           Int      @default(1)
-  totalCartItemPrice Decimal?
+  quantity           Int?      @default(1)
+  color              String
+  size               String
+  cartItemTotalPrice Decimal
 
   cartId    Int
-  cart      Cart    @relation(fields: [cartId], references: [id])
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId String  @unique
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -111,7 +113,7 @@ model Order {
   status      String
 
   customerId String      @unique
-  customer   User        @relation(fields: [customerId], references: [id])
+  customer   User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
   items      OrderItem[]
 
   createdAt DateTime @default(now())
@@ -121,12 +123,14 @@ model Order {
 model OrderItem {
   id       Int     @id @default(autoincrement())
   quantity Int
+  color     String
+  size      String
   price    Decimal
   orderId  Int
 
-  order     Order   @relation(fields: [orderId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String  @unique
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

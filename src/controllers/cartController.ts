@@ -8,6 +8,7 @@ import {
   updateQuantity,
 } from "../services/cartService";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
+import { AppError } from "../middlewares/AppError";
 
 export const getUserCart = async (
   req: AuthenticatedRequest,
@@ -31,10 +32,16 @@ export const addProductToCart = async (
   try {
     const userId = req.user!.id;
 
-    const { productId, quantity } = req.body;
+    const { productId, size, color, quantity } = req.body;
+
+    if (!productId || !size || !color) {
+      throw new AppError(400, "Missing required fields");
+    }
 
     const cart = await addToCart(userId, {
       productId,
+      size,
+      color,
       quantity,
     });
     res.status(201).json(cart);
