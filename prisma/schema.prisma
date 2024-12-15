@@ -65,8 +65,8 @@ model Product {
   price              Decimal
   priceAfterDiscount Decimal?
 
-  images            String[]
-  diamensionsImages String[]
+  images           String[]
+  dimensionsImages String[]
 
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId String?

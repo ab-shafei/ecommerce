@@ -10,7 +10,7 @@ import {
 import { AppError } from "../middlewares/AppError";
 import { Decimal } from "@prisma/client/runtime/library";
 
-const allowedUploadTypes = ["images", "diamensionsImages"];
+const allowedUploadTypes = ["images", "dimensionsImages"];
 
 export const getAllProducts = async (
   _req: Request,

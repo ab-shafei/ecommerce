@@ -104,14 +104,14 @@ export const uploadImages = async ({
         where: { id },
         data: { images: imageURLs },
       });
-    case "diamensionsImages":
-      const { imageURLs: diamensionsImages } = await resizeAndSaveProductImages(
-        "product-diamensions",
+    case "dimensionsImages":
+      const { imageURLs: dimensionsImages } = await resizeAndSaveProductImages(
+        "product-dimensions",
         files
       );
       return await prisma.product.update({
         where: { id },
-        data: { diamensionsImages },
+        data: { dimensionsImages },
       });
     default:
   }
