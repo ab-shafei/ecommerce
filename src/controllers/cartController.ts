@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 
 import {
   addToCart,
+  applyCoupon,
   clearCartItems,
   fetchUserCart,
   removeFromCart,
@@ -65,6 +66,26 @@ export const updateProductQuantity = async (
       quantity,
     });
 
+    res.status(200).json(cart);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const applyCouponToUserCart = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const customerId = req.user!.id;
+    const { code } = req.body;
+
+    if (!code) {
+      throw new AppError(400, "Missing required fields (code)");
+    }
+
+    const cart = await applyCoupon({ customerId, code });
     res.status(200).json(cart);
   } catch (error) {
     next(error);

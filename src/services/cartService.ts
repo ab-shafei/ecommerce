@@ -147,6 +147,79 @@ export const updateQuantity = async (
   return newCartItem;
 };
 
+export const applyCoupon = async ({
+  customerId,
+  code,
+}: {
+  customerId: string;
+  code: string;
+}) => {
+  const today = new Date();
+  const coupon = await prisma.coupon.findFirst({
+    where: {
+      code,
+      start: {
+        lte: today,
+      },
+      end: {
+        gte: today,
+      },
+    },
+  });
+
+  if (!coupon) {
+    throw new AppError(404, "Coupon not found or expired");
+  }
+
+  if (coupon.status === "USED") {
+    throw new AppError(404, "Coupon already used");
+  }
+
+  const cart = await prisma.cart.findFirst({
+    where: {
+      customerId,
+    },
+  });
+
+  if (!cart?.cartTotalPrice) {
+    throw new AppError(404, "No cart found for this user");
+  }
+
+  const { cartTotalPrice } = cart;
+  const { minPurchase } = coupon;
+
+  if (minPurchase && cartTotalPrice < minPurchase) {
+    throw new AppError(
+      404,
+      "Your cart purchase is less than coupon minimum purchase"
+    );
+  }
+
+  const { discount } = coupon;
+  const discountAmount = cartTotalPrice.mul(discount).div(100);
+  const cartTotalPriceAfterDiscount = cartTotalPrice.minus(discountAmount);
+
+  const cartAfterDiscount = await prisma.cart.update({
+    where: {
+      customerId,
+    },
+    data: {
+      cartTotalPriceAfterDiscount,
+    },
+  });
+
+  const updatedCoupon = await prisma.coupon.update({
+    where: {
+      code,
+    },
+    data: {
+      numberOfUsage: { increment: 1 },
+      status: "USED",
+    },
+  });
+  return cartAfterDiscount;
+};
+
 export const removeFromCart = async (
   customerId: string,
   data: { productId: string }

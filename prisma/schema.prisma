@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearchPostgres"]
 }
 
@@ -79,8 +79,8 @@ model Product {
 }
 
 model Cart {
-  id                      Int      @id @default(autoincrement())
-  cartTotalPrice          Decimal?
+  id                          Int      @id @default(autoincrement())
+  cartTotalPrice              Decimal?
   cartTotalPriceAfterDiscount Decimal?
 
   customerId String     @unique
@@ -92,8 +92,8 @@ model Cart {
 }
 
 model CartItem {
-  id                 Int      @id @default(autoincrement())
-  quantity           Int?      @default(1)
+  id                 Int     @id @default(autoincrement())
+  quantity           Int?    @default(1)
   color              String
   size               String
   cartItemTotalPrice Decimal
@@ -123,8 +123,8 @@ model Order {
 model OrderItem {
   id       Int     @id @default(autoincrement())
   quantity Int
-  color     String
-  size      String
+  color    String
+  size     String
   price    Decimal
   orderId  Int
 
@@ -137,14 +137,20 @@ model OrderItem {
 }
 
 model Coupon {
-  id        Int      @id @default(autoincrement())
-  code      String   @unique
-  discount  Decimal
-  type      String
-  minAmount Decimal?
-  expiresAt DateTime
-  isActive  Boolean  @default(true)
+  id            Int          @id @default(autoincrement())
+  code          String       @unique
+  discount      Int
+  start         DateTime
+  end           DateTime
+  minPurchase   Decimal?
+  numberOfUsage Int?         @default(0)
+  status        CouponStatus @default(UNUSED)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum CouponStatus {
+  UNUSED
+  USED
+  EXPIRED
 }
