@@ -8,7 +8,7 @@ import {
   uploadProductImages,
 } from "../controllers/productController";
 import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
-import { uploadMultipleImages } from "../middlewares/uploadImageMiddleare";
+import { uploadMultipleImages } from "../middlewares/uploadImageMiddleware";
 
 const router = Router();
 

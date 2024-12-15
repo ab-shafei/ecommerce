@@ -33,12 +33,15 @@ export const resizeAndSaveCategoryImages = async (
   return { imageURLs };
 };
 
-export const fetchAllCategorys = async () => {
+export const fetchAllCategories = async () => {
   return await prisma.category.findMany();
 };
 
 export const fetchCategoryById = async (id: string) => {
-  const category = await prisma.category.findUnique({ where: { id } });
+  const category = await prisma.category.findUnique({
+    where: { id },
+    include: { products: true },
+  });
   if (!category) {
     throw new AppError(404, "Category not found");
   }

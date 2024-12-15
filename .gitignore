@@ -5,3 +5,5 @@ node_modules
 dist
 uploads
 postgresData
+.vscode
+database

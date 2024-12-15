@@ -3,10 +3,10 @@ services:
     depends_on:
       - postgresdb
     build: .
-    container_name: ecommerce-api-app
+    container_name: taleen-api-app
     restart: unless-stopped
     volumes:
-      - /root/apps/ecommerceApi/uploads:/app/uploads
+      - /root/apps/taleen-api/uploads:/app/uploads
     env_file: ./.env
     ports:
       - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT

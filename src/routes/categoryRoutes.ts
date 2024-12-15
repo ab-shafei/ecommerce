@@ -1,18 +1,18 @@
 import { Router } from "express";
 import {
   deleteCategory,
-  getAllCategorys,
+  getAllCategories,
   getCategoryById,
   createCategory,
   updateCategory,
   uploadCategoryImages,
 } from "../controllers/categoryController";
 import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
-import { uploadMultipleImages } from "../middlewares/uploadImageMiddleare";
+import { uploadMultipleImages } from "../middlewares/uploadImageMiddleware";
 
 const router = Router();
 
-router.get("/", getAllCategorys);
+router.get("/", getAllCategories);
 router.get("/:id", getCategoryById);
 router.post("/", authenticateJWT, authorizeRoles("ADMIN"), createCategory);
 router.post(

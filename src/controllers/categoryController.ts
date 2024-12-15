@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   addCategory,
-  fetchAllCategorys,
+  fetchAllCategories,
   fetchCategoryById,
   modifyCategory,
   removeCategory,
@@ -11,14 +11,14 @@ import { AppError } from "../middlewares/AppError";
 
 const allowedUploadTypes = ["images"];
 
-export const getAllCategorys = async (
+export const getAllCategories = async (
   _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const categorys = await fetchAllCategorys();
-    res.status(200).json(categorys);
+    const categories = await fetchAllCategories();
+    res.status(200).json(categories);
   } catch (error) {
     next(error);
   }
