@@ -46,21 +46,20 @@ export const createProduct = async (
 ) => {
   try {
     const { name, color, size, price, inStock, categoryId } = req.body;
-    console.log(req.body);
 
     // Convert price to Decimal
-    let decimalPrice;
-    try {
-      decimalPrice = new Decimal(price); // Handles precise conversions
-    } catch (error) {
-      throw new AppError(400, "Price must be valid number");
+    const convertedPrice = Number(price);
+    if (isNaN(convertedPrice)) {
+      throw new AppError(400, "Price must be a valid number");
     }
+    const decimalPrice = new Decimal(convertedPrice); // Handles precise conversions
     const product = await addProduct({
       name,
       color,
       size,
       price: decimalPrice,
       categoryId,
+      inStock,
     });
     res.status(201).json(product);
   } catch (error) {

@@ -64,6 +64,7 @@ export const addProduct = async (data: {
   price: Decimal;
   priceAfterDiscount?: Decimal;
   categoryId: string;
+  inStock?: boolean;
 }) => {
   const existingProduct = await prisma.product.findFirst({
     where: { name: data.name },

@@ -16,7 +16,7 @@ export const fetchCouponById = async (id: number) => {
 
 export const addCoupon = async (data: {
   code: string;
-  discount: number;
+  discount: Decimal;
   start: Date;
   end: Date;
   minPurchase?: Decimal;

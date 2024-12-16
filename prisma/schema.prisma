@@ -139,7 +139,7 @@ model OrderItem {
 model Coupon {
   id            Int          @id @default(autoincrement())
   code          String       @unique
-  discount      Int
+  discount      Decimal
   start         DateTime
   end           DateTime
   minPurchase   Decimal?

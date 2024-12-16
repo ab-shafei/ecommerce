@@ -7,6 +7,7 @@ import {
   removeCoupon,
 } from "../services/couponServices";
 import { AppError } from "../middlewares/AppError";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export const getAllCoupons = async (
   _req: Request,
@@ -53,9 +54,11 @@ export const createCoupon = async (
       throw new AppError(400, "Missing required fields");
     }
 
-    if (isNaN(parseInt(discount, 10))) {
-      throw new AppError(400, "Invalid value for 'discount', must be a number");
+    const convertedDiscount = Number(discount);
+    if (isNaN(convertedDiscount)) {
+      throw new AppError(400, "discount must be a valid number");
     }
+    const decimalDiscount = new Decimal(convertedDiscount); // Handles precise conversions
 
     if (isNaN(Date.parse(start))) {
       throw new AppError(400, "Invalid date for 'start'");
@@ -75,7 +78,7 @@ export const createCoupon = async (
 
     const coupon = await addCoupon({
       code,
-      discount,
+      discount: decimalDiscount,
       start: startDate,
       end: endDate,
       minPurchase,
