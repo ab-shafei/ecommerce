@@ -3,11 +3,13 @@ import {
   addCoupon,
   fetchAllCoupons,
   fetchCouponById,
+  fetchLoggedUserCoupons,
   modifyCoupon,
   removeCoupon,
 } from "../services/couponServices";
 import { AppError } from "../middlewares/AppError";
 import { Decimal } from "@prisma/client/runtime/library";
+import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
 export const getAllCoupons = async (
   _req: Request,
@@ -16,6 +18,20 @@ export const getAllCoupons = async (
 ) => {
   try {
     const coupons = await fetchAllCoupons();
+    res.status(200).json(coupons);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getLoggedUserCoupons = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.user!;
+  try {
+    const coupons = await fetchLoggedUserCoupons(id);
     res.status(200).json(coupons);
   } catch (error) {
     next(error);

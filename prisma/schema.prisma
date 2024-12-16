@@ -18,12 +18,14 @@ model User {
   resetToken    String?
   resetTokenExp DateTime?
 
-  Profile Profile?
+  profile Profile?
   cart    Cart[]
   order   Order[]
+  couponUsage CouponUsage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
 }
 
 model Profile {
@@ -147,10 +149,22 @@ model Coupon {
   status        CouponStatus @default(UNUSED)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+
+  couponUsage CouponUsage[]
 }
 
 enum CouponStatus {
   UNUSED
   USED
   EXPIRED
+}
+
+model CouponUsage {
+  id       Int      @id @default(autoincrement())
+  userId   String
+  couponId Int
+  usedAt   DateTime @default(now())
+
+  user   User   @relation(references: [id], fields: [userId])
+  coupon Coupon @relation(references: [id], fields: [couponId])
 }

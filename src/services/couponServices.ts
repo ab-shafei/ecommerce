@@ -6,6 +6,42 @@ export const fetchAllCoupons = async () => {
   return await prisma.coupon.findMany();
 };
 
+export const fetchLoggedUserCoupons = async (userId: string) => {
+  const [unused, used, expired] = await prisma.$transaction([
+    prisma.coupon.findMany({
+      where: {
+        couponUsage: {
+          none: {
+            userId,
+          },
+        },
+      },
+    }),
+    prisma.coupon.findMany({
+      where: {
+        couponUsage: {
+          some: {
+            userId,
+          },
+        },
+      },
+    }),
+    prisma.coupon.findMany({
+      where: {
+        end: {
+          lt: new Date(),
+        },
+        couponUsage: {
+          none: {
+            userId,
+          },
+        },
+      },
+    }),
+  ]);
+  return { unused, used, expired };
+};
+
 export const fetchCouponById = async (id: number) => {
   const coupon = await prisma.coupon.findUnique({ where: { id } });
   if (!coupon) {

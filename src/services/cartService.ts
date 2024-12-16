@@ -34,13 +34,6 @@ export const addToCart = async (
     throw new AppError(404, "Product not found");
   }
 
-  // Step 2: Ensure the customer has a cart
-  const cart = await prisma.cart.upsert({
-    where: { customerId },
-    update: {},
-    create: { customerId },
-  });
-
   if (
     !product.size.some(
       (s) => s.toLocaleLowerCase() === size.toLocaleLowerCase()
@@ -56,6 +49,13 @@ export const addToCart = async (
   ) {
     throw new AppError(404, "Color not available for this product");
   }
+
+  // Step 2: Ensure the customer has a cart
+  const cart = await prisma.cart.upsert({
+    where: { customerId },
+    update: {},
+    create: { customerId },
+  });
 
   // Step 3: Check if the cart item already exists
   const existingCartItem = await prisma.cartItem.findUnique({
@@ -171,8 +171,15 @@ export const applyCoupon = async ({
     throw new AppError(404, "Coupon not found or expired");
   }
 
-  if (coupon.status === "USED") {
-    throw new AppError(404, "Coupon already used");
+  const usage = await prisma.couponUsage.findFirst({
+    where: {
+      userId: customerId,
+      couponId: coupon.id,
+    },
+  });
+
+  if (usage) {
+    throw new AppError(400, "Coupon already used by this user");
   }
 
   const cart = await prisma.cart.findFirst({
@@ -195,28 +202,38 @@ export const applyCoupon = async ({
     );
   }
 
+  // calculate discount
   const { discount } = coupon;
   const discountAmount = cartTotalPrice.mul(discount).div(100);
   const cartTotalPriceAfterDiscount = cartTotalPrice.minus(discountAmount);
 
-  const cartAfterDiscount = await prisma.cart.update({
-    where: {
-      customerId,
-    },
-    data: {
-      cartTotalPriceAfterDiscount,
-    },
-  });
-
-  const updatedCoupon = await prisma.coupon.update({
-    where: {
-      code,
-    },
-    data: {
-      numberOfUsage: { increment: 1 },
-      status: "USED",
-    },
-  });
+  //do all operations in a $transaction
+  const [cartAfterDiscount, updatedCoupon, newUsage] =
+    await prisma.$transaction([
+      prisma.cart.update({
+        where: {
+          customerId,
+        },
+        data: {
+          cartTotalPriceAfterDiscount,
+        },
+      }),
+      prisma.coupon.update({
+        where: {
+          code,
+        },
+        data: {
+          numberOfUsage: { increment: 1 },
+          status: "USED",
+        },
+      }),
+      prisma.couponUsage.create({
+        data: {
+          userId: customerId,
+          couponId: coupon.id,
+        },
+      }),
+    ]);
   return cartAfterDiscount;
 };
 
