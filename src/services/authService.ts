@@ -3,12 +3,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import prisma from "../utils/prismaClient";
-import {
-  validateEmail,
-  validateName,
-  validatePassword,
-  validatePhoneNumber,
-} from "../utils/validate";
 import { AppError } from "../middlewares/AppError";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
@@ -19,37 +13,6 @@ export const registerUser = async (
   name: string,
   phoneNumber: string
 ) => {
-  if (!email || !password || !name || !phoneNumber) {
-    throw new AppError(400, "Missing required fields");
-  }
-
-  // Validate the email format
-  if (!validateEmail(email)) {
-    throw new AppError(400, "Invalid email format");
-  }
-
-  // Validate the password strength
-  if (!validatePassword(password)) {
-    throw new AppError(
-      400,
-      "Password must be at least 8 characters long and include at least one letter and one number"
-    );
-  }
-
-  // Validate the name
-  if (!validateName(name)) {
-    throw new AppError(400, "Name must be at least 2 characters long");
-  }
-
-  // Validate the phone number format
-  if (!validatePhoneNumber(phoneNumber)) {
-    throw new AppError(
-      400,
-      'Invalid phone number format. It should start with "+" and include 10-15 digits'
-    );
-  }
-
-  // Check if the email is already registered
   const existingUserByEmail = await prisma.user.findUnique({
     where: { email },
   });
@@ -57,7 +20,6 @@ export const registerUser = async (
     throw new AppError(400, "Email is already registered");
   }
 
-  //   // Check if the phone number is already registered
   const existingUserByPhone = await prisma.user.findUnique({
     where: { phoneNumber },
   });
@@ -115,7 +77,7 @@ export const forgetUserPassword = async (email: string) => {
     where: { email },
     data: {
       resetToken: hash,
-      resetTokenExp: new Date(Date.now() + 3600000), // 1 hour
+      resetTokenExp: new Date(Date.now() + 3600000),
     },
   });
 
@@ -155,14 +117,6 @@ export const resetUserPassword = async (token: string, newPassword: string) => {
   const isValid = await bcrypt.compare(token, user.resetToken!);
   if (!isValid) throw new AppError(400, "Invalid or expired reset token");
 
-  // Validate the password strength
-  if (!validatePassword(newPassword)) {
-    throw new AppError(
-      400,
-      "Password must be at least 8 characters long and include at least one letter and one number"
-    );
-  }
-
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await prisma.user.update({
     where: { id: user.id },
@@ -194,14 +148,6 @@ export const changePassword = async (
   }
   const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
   if (!isPasswordValid) throw new AppError(400, "Wrong password");
-
-  // Validate the password strength
-  if (!validatePassword(newPassword)) {
-    throw new AppError(
-      400,
-      "Password must be at least 8 characters long and include at least one letter and one number"
-    );
-  }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 

@@ -18,26 +18,27 @@ model User {
   resetToken    String?
   resetTokenExp DateTime?
 
-  profile Profile?
-  cart    Cart[]
-  order   Order[]
+  address     Address[]
+  cart        Cart[]
+  order       Order[]
   couponUsage CouponUsage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
-model Profile {
-  id        String  @id @default(uuid())
-  firstName String
-  lastName  String
-  address   String
-  phone     String?
-  avatarUrl String?
+model Address {
+  id           Int     @id @default(autoincrement())
+  name         String
+  phoneNumber  String
+  city         String
+  region       String
+  addressLine1 String
+  addressLine2 String?
+  isDefault    Boolean @default(false)
 
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
