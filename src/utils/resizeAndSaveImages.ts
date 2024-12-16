@@ -28,7 +28,7 @@ export default async function resizeAndSaveImages(
         .jpeg({ quality: 95 })
         .toFile(`uploads/${type}/${imageName}`);
 
-      imageURLs.push(`${SERVER_URL}/api/images/${type}}/${imageName}`);
+      imageURLs.push(`${SERVER_URL}/api/images/${type}/${imageName}`);
     })
   );
 
