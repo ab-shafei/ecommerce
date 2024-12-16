@@ -1,37 +1,6 @@
-import fs from "fs";
-import path from "path";
 import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
-import sharp from "sharp";
-import { v4 as uuidv4 } from "uuid";
-
-const SERVER_URL = process.env.SERVER_URL;
-
-export const resizeAndSaveCategoryImages = async (
-  imagePrefix: string,
-  files: Express.Multer.File[]
-) => {
-  const imageURLs: string[] = [];
-  const uploadDir = path.join(__dirname, "../../uploads/category");
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-  await Promise.all(
-    files.map(async (img, index) => {
-      const imageURL = `${imagePrefix}-${uuidv4()}-${Date.now()}-${
-        index + 1
-      }.jpeg`;
-
-      await sharp(img.buffer)
-        .toFormat("jpeg")
-        .jpeg({ quality: 95 })
-        .toFile(`uploads/category/${imageURL}`);
-
-      imageURLs.push(`${SERVER_URL}/api/images/category/${imageURL}`);
-    })
-  );
-  return { imageURLs };
-};
+import resizeAndSaveImages from "../utils/resizeAndSaveImages";
 
 export const fetchAllCategories = async () => {
   return await prisma.category.findMany();
@@ -77,7 +46,8 @@ export const uploadImages = async ({
   }
   switch (uploadType) {
     case "images":
-      const { imageURLs } = await resizeAndSaveCategoryImages(
+      const { imageURLs } = await resizeAndSaveImages(
+        "category",
         "category",
         files
       );

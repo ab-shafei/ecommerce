@@ -1,39 +1,7 @@
-import fs from "fs";
-import path from "path";
 import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
-import sharp from "sharp";
-import { v4 as uuidv4 } from "uuid";
 import { Decimal } from "@prisma/client/runtime/library";
-
-const SERVER_URL = process.env.SERVER_URL;
-
-export const resizeAndSaveProductImages = async (
-  imagePrefix: string,
-  files: Express.Multer.File[]
-) => {
-  const imageURLs: string[] = [];
-  const uploadDir = path.join(__dirname, "../../uploads/product");
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-  await Promise.all(
-    files.map(async (img, index) => {
-      const imageName = `${imagePrefix}-${uuidv4()}-${Date.now()}-${
-        index + 1
-      }.jpeg`;
-
-      await sharp(img.buffer)
-        .toFormat("jpeg")
-        .jpeg({ quality: 95 })
-        .toFile(`uploads/product/${imageName}`);
-
-      imageURLs.push(`${SERVER_URL}/api/images/product/${imageName}`);
-    })
-  );
-
-  return { imageURLs };
-};
+import resizeAndSaveImages from "../utils/resizeAndSaveImages";
 
 export const fetchAllProducts = async () => {
   return await prisma.product.findMany();
@@ -100,14 +68,15 @@ export const uploadImages = async ({
   }
   switch (uploadType) {
     case "images":
-      const { imageURLs } = await resizeAndSaveProductImages("product", files);
+      const { imageURLs } = await resizeAndSaveImages("", "product", files);
       return await prisma.product.update({
         where: { id },
         data: { images: imageURLs },
       });
     case "dimensionsImages":
-      const { imageURLs: dimensionsImages } = await resizeAndSaveProductImages(
+      const { imageURLs: dimensionsImages } = await resizeAndSaveImages(
         "product-dimensions",
+        "product",
         files
       );
       return await prisma.product.update({

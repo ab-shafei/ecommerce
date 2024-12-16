@@ -15,6 +15,7 @@ import cartRoutes from "./routes/cartRoutes";
 import searchRoutes from "./routes/searchRoutes";
 import couponRoutes from "./routes/couponRoutes";
 import addressRoutes from "./routes/addressRoutes";
+import layoutRoutes from "./routes/layoutRoutes";
 
 import path from "path";
 import { notFound } from "./controllers/notFoundController";
@@ -45,6 +46,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/coupon", couponRoutes);
 app.use("/api/address", addressRoutes);
+app.use("/api/layout", layoutRoutes);
 
 // Error Handling
 app.use(errorHandler);
