@@ -2,6 +2,10 @@ import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
 import { Decimal } from "@prisma/client/runtime/library";
 import resizeAndSaveImages from "../utils/resizeAndSaveImages";
+import {
+  CreateProductType,
+  UpdateProductType,
+} from "../validations/schemas/productSchema";
 
 export const fetchAllProducts = async () => {
   return await prisma.product.findMany();
@@ -25,15 +29,7 @@ export const fetchProductById = async (id: string) => {
   return { product, relatedProducts };
 };
 
-export const addProduct = async (data: {
-  name: string;
-  color: string[];
-  size: string[];
-  price: Decimal;
-  priceAfterDiscount?: Decimal;
-  categoryId: string;
-  inStock?: boolean;
-}) => {
+export const addProduct = async (data: CreateProductType) => {
   const existingProduct = await prisma.product.findFirst({
     where: { name: data.name },
   });
@@ -91,18 +87,7 @@ export const uploadImages = async ({
   }
 };
 
-export const modifyProduct = async (
-  id: string,
-  data: {
-    name?: string;
-    color?: string[];
-    size?: string[];
-    price?: Decimal;
-    priceAfterDiscount?: Decimal;
-    inStock?: boolean;
-    categoryId?: string;
-  }
-) => {
+export const modifyProduct = async (id: string, data: UpdateProductType) => {
   const product = await prisma.product.findUnique({
     where: { id },
   });

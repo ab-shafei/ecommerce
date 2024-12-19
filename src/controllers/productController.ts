@@ -8,7 +8,6 @@ import {
   uploadImages,
 } from "../services/productService";
 import { AppError } from "../middlewares/AppError";
-import { Decimal } from "@prisma/client/runtime/library";
 
 const allowedUploadTypes = ["images", "dimensionsImages"];
 
@@ -45,37 +44,7 @@ export const createProduct = async (
   next: NextFunction
 ) => {
   try {
-    const {
-      name,
-      color,
-      size,
-      price,
-      inStock,
-      categoryId,
-      priceAfterDiscount,
-    } = req.body;
-
-    if (!name || !color || !size || !price || !categoryId) {
-      throw new AppError(400, "Missing required fields");
-    }
-
-    if (isNaN(price)) {
-      throw new AppError(400, "Price must be a valid number");
-    }
-
-    if (priceAfterDiscount && isNaN(priceAfterDiscount)) {
-      throw new AppError(400, "priceAfterDiscount  must be a valid number");
-    }
-
-    const product = await addProduct({
-      name,
-      color,
-      size,
-      price,
-      categoryId,
-      inStock,
-      priceAfterDiscount,
-    });
+    const product = await addProduct(req.body);
     res.status(201).json(product);
   } catch (error) {
     next(error);
@@ -113,34 +82,7 @@ export const updateProduct = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const {
-      name,
-      color,
-      size,
-      price,
-      priceAfterDiscount,
-      inStock,
-      categoryId,
-    } = req.body;
-
-    if (price && isNaN(price)) {
-      throw new AppError(400, "Price must be a valid number");
-    }
-
-    if (priceAfterDiscount && isNaN(priceAfterDiscount)) {
-      throw new AppError(400, "Price must be a valid number");
-    }
-
-    const product = await modifyProduct(id, {
-      name,
-      color,
-      size,
-      price,
-      priceAfterDiscount,
-      inStock,
-      categoryId,
-    });
+    const product = await modifyProduct(req.params.id, req.body);
     res.status(200).json(product);
   } catch (error) {
     next(error);
