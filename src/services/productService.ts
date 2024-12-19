@@ -68,7 +68,11 @@ export const uploadImages = async ({
   }
   switch (uploadType) {
     case "images":
-      const { imageURLs } = await resizeAndSaveImages("", "product", files);
+      const { imageURLs } = await resizeAndSaveImages(
+        "product",
+        "product",
+        files
+      );
       return await prisma.product.update({
         where: { id },
         data: { images: imageURLs },
@@ -94,8 +98,8 @@ export const modifyProduct = async (
     color?: string[];
     size?: string[];
     price?: Decimal;
-    inStock?: boolean;
     priceAfterDiscount?: Decimal;
+    inStock?: boolean;
     categoryId?: string;
   }
 ) => {

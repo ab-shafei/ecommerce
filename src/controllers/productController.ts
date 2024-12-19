@@ -45,21 +45,36 @@ export const createProduct = async (
   next: NextFunction
 ) => {
   try {
-    const { name, color, size, price, inStock, categoryId } = req.body;
+    const {
+      name,
+      color,
+      size,
+      price,
+      inStock,
+      categoryId,
+      priceAfterDiscount,
+    } = req.body;
 
-    // Convert price to Decimal
-    const convertedPrice = Number(price);
-    if (isNaN(convertedPrice)) {
+    if (!name || !color || !size || !price || !categoryId) {
+      throw new AppError(400, "Missing required fields");
+    }
+
+    if (isNaN(price)) {
       throw new AppError(400, "Price must be a valid number");
     }
-    const decimalPrice = new Decimal(convertedPrice); // Handles precise conversions
+
+    if (priceAfterDiscount && isNaN(priceAfterDiscount)) {
+      throw new AppError(400, "priceAfterDiscount  must be a valid number");
+    }
+
     const product = await addProduct({
       name,
       color,
       size,
-      price: decimalPrice,
+      price,
       categoryId,
       inStock,
+      priceAfterDiscount,
     });
     res.status(201).json(product);
   } catch (error) {
@@ -109,22 +124,21 @@ export const updateProduct = async (
       categoryId,
     } = req.body;
 
-    // Convert price to Decimal
-    let decimalPrice;
-    if (price) {
-      try {
-        decimalPrice = new Decimal(price); // Handles precise conversions
-      } catch (error) {
-        throw new AppError(400, "Price must be valid number");
-      }
+    if (price && isNaN(price)) {
+      throw new AppError(400, "Price must be a valid number");
     }
+
+    if (priceAfterDiscount && isNaN(priceAfterDiscount)) {
+      throw new AppError(400, "Price must be a valid number");
+    }
+
     const product = await modifyProduct(id, {
       name,
       color,
       size,
-      price: decimalPrice,
-      inStock,
+      price,
       priceAfterDiscount,
+      inStock,
       categoryId,
     });
     res.status(200).json(product);
