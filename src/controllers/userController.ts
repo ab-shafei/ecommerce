@@ -1,6 +1,51 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { AppError } from "../middlewares/AppError";
-import { modifyUser, removeUser } from "../services/userservice";
+import {
+  addUser,
+  getCustomers,
+  getUsers,
+  modifyUser,
+  removeUser,
+} from "../services/userservice";
+
+export const createUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await addUser(req.body);
+    res.status(201).send(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const users = await getUsers();
+    res.status(200).send(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllCustomers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const customers = await getCustomers();
+    res.status(200).send(customers);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
