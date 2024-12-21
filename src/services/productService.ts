@@ -1,6 +1,5 @@
 import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
-import { Decimal } from "@prisma/client/runtime/library";
 import resizeAndSaveImages from "../utils/resizeAndSaveImages";
 import {
   CreateProductType,

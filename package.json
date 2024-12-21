@@ -29,12 +29,13 @@
     "@types/node": "^22.7.8",
     "@types/nodemailer": "^6.4.17",
     "nodemon": "^3.1.7",
-    "prisma": "^6.0.1",
+    "prisma": "^6.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@prisma/client": "^6.0.1",
+    "@prisma/client": "^6.1.0",
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "compression": "^1.7.4",

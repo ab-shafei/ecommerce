@@ -42,11 +42,8 @@ model Address {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-enum Role {
-  CUSTOMER
-  ADMIN
+  order Order[]
 }
 
 model Category {
@@ -67,7 +64,7 @@ model Product {
   inStock            Boolean  @default(true)
   price              Decimal
   priceAfterDiscount Decimal?
-
+  homePage           Boolean  @default(false)
   images           String[]
   dimensionsImages String[]
 
@@ -83,8 +80,8 @@ model Product {
 
 model Cart {
   id                          Int      @id @default(autoincrement())
-  cartTotalPrice              Decimal?
-  cartTotalPriceAfterDiscount Decimal?
+  cartTotalPrice              Decimal @default(0)
+  cartTotalPriceAfterDiscount Decimal @default(0)
 
   customerId String     @unique
   customer   User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
@@ -111,12 +108,21 @@ model CartItem {
 }
 
 model Order {
-  id          Int     @id @default(autoincrement())
-  totalAmount Decimal
-  status      String
-
+  id                Int             @id @default(autoincrement())
+  total             Decimal
+  shipping          Decimal        @default(0)
+  contactNumber     String
+  status            OrderStatus?    @default(PROCESSING)
+  paymentMethod     PaymentMethod @default(CASH)
+  paid              Boolean        @default(false)
+  trackingNumber String?
+  estimatedDelivery DateTime?
+  deliveredAt    DateTime?
   customerId String      @unique
+  shippingAddressId Int
+
   customer   User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  shippingAddress   Address @relation(fields: [shippingAddressId], references: [id])
   items      OrderItem[]
 
   createdAt DateTime @default(now())
@@ -129,11 +135,11 @@ model OrderItem {
   color    String
   size     String
   price    Decimal
+  productId String  @unique
   orderId  Int
 
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String  @unique
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,16 +154,11 @@ model Coupon {
   minPurchase   Decimal?
   numberOfUsage Int?         @default(0)
   status        CouponStatus @default(UNUSED)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
 
   couponUsage CouponUsage[]
-}
 
-enum CouponStatus {
-  UNUSED
-  USED
-  EXPIRED
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 model CouponUsage {
@@ -178,4 +179,30 @@ model Layout {
 
   contactEmail       String?
   contactPhoneNumber String?
+}
+
+// ENUMS
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum CouponStatus {
+  UNUSED
+  USED
+  EXPIRED
+}
+
+enum OrderStatus {
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  FAILED
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  VISA
+  WALLET
 }

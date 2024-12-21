@@ -16,6 +16,7 @@ export const CreateProductSchema = object({
   size: array(string()),
   price: pipe(string(), decimal()),
   inStock: optional(boolean(), true),
+  homePage: optional(boolean(), false),
   categoryId: string(),
   priceAfterDiscount: optional(pipe(string(), decimal())),
 });
@@ -26,6 +27,7 @@ export const UpdateProductSchema = object({
   size: optional(array(string())),
   price: optional(pipe(string(), decimal())),
   inStock: optional(boolean()),
+  homePage: optional(boolean()),
   categoryId: optional(string()),
   priceAfterDiscount: optional(pipe(string(), decimal())),
 });
