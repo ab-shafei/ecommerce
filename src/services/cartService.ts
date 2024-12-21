@@ -133,18 +133,39 @@ export const updateQuantity = async (
       cartId: cart.id,
       productId: data.productId,
     },
+    include: { product: true },
   });
 
   if (!cartItem) {
     throw new AppError(404, "Cart item not found");
   }
 
+  // calculate the new total price for the cart item
+  const productPrice = cartItem.product.price;
+  const cartItemTotalPrice = productPrice.mul(data.quantity);
+
+  // update the cart item
   const newCartItem = await prisma.cartItem.update({
     where: { productId: data.productId },
-    data: { quantity: data.quantity },
+    data: { quantity: data.quantity, cartItemTotalPrice },
   });
 
-  return newCartItem;
+  // recalculate and update the cart
+  const cartItems = await prisma.cartItem.findMany({
+    where: { cartId: cart.id },
+    select: { cartItemTotalPrice: true },
+  });
+
+  const cartTotalPrice = cartItems
+    .map((item) => new Decimal(item.cartItemTotalPrice))
+    .reduce((acc, price) => acc.add(price), new Decimal(0));
+
+  await prisma.cart.update({
+    where: { id: cart.id },
+    data: { cartTotalPrice },
+  });
+
+  return { ...newCartItem, cartTotalPrice };
 };
 
 export const applyCoupon = async ({
