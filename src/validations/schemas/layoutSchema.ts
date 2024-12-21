@@ -19,7 +19,7 @@ export const ChangeLayoutSchema = object({
   contactPhoneNumber: optional(
     pipe(
       string("Enter phone number"),
-      regex(/^01\d{9}/, "Phone number must be 11 numbers starting with 01")
+      regex(/^01\d{9}$/, "Phone number must be 11 numbers starting with 01")
     )
   ),
 });
