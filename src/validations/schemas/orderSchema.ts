@@ -1,0 +1,54 @@
+import { OrderStatus, PaymentMethod } from "@prisma/client";
+import {
+  decimal,
+  object,
+  pipe,
+  string,
+  optional,
+  InferInput,
+  regex,
+  enum as venum,
+  number,
+  date,
+} from "valibot";
+
+export const CreateOrderSchema = object({
+  shipping: optional(pipe(string(), decimal())),
+  contactNumber: pipe(
+    string("Enter phone number"),
+    regex(/^01\d{9}/, "Phone number must be 11 numbers starting with 01")
+  ),
+  paymentMethod: venum(PaymentMethod, "Invalid Payment Method"),
+  shippingAddressId: number("shippingAddressId not provided"),
+});
+
+export const UpdateOrderSchema = object({
+  totalAmount: optional(pipe(string(), decimal())),
+  supTotal: optional(pipe(string(), decimal())),
+  shipping: optional(pipe(string(), decimal())),
+  discount: optional(pipe(string(), decimal())),
+  total: optional(pipe(string(), decimal())),
+  contactNumber: optional(
+    pipe(
+      string("Enter phone number"),
+      regex(/^01\d{9}/, "Phone number must be 11 numbers starting with 01")
+    )
+  ),
+  status: optional(venum(OrderStatus, "Invalid Order Status")),
+  paymentMethod: optional(venum(PaymentMethod, "Invalid Payment Method")),
+  trackingNumber: optional(string()),
+  estimatedDelivery: optional(date()),
+  deliveredAt: optional(date()),
+  shippingAddressId: optional(number()),
+});
+
+export const CreateOrderRequestSchema = object({
+  body: CreateOrderSchema,
+});
+
+export const UpdateOrderRequestSchema = object({
+  body: UpdateOrderSchema,
+});
+
+export type CreateOrderType = InferInput<typeof CreateOrderSchema>;
+export type UpdateOrderType = InferInput<typeof UpdateOrderSchema>;

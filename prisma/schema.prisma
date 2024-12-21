@@ -93,7 +93,7 @@ model Cart {
 
 model CartItem {
   id                 Int     @id @default(autoincrement())
-  quantity           Int?    @default(1)
+  quantity           Int   
   color              String
   size               String
   cartItemTotalPrice Decimal
@@ -118,9 +118,10 @@ model Order {
   trackingNumber    String?
   estimatedDelivery DateTime?
   deliveredAt       DateTime?
-  customerId        String        @unique
+  customerId        String       
   shippingAddressId Int
-
+  paymentIntentId   String?
+  payMobOrderId     Int?
   customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
   shippingAddress Address     @relation(fields: [shippingAddressId], references: [id])
   items           OrderItem[]
@@ -131,11 +132,12 @@ model Order {
 
 model OrderItem {
   id        Int     @id @default(autoincrement())
+  name      String
   quantity  Int
   color     String
   size      String
   price     Decimal
-  productId String  @unique
+  productId String 
   orderId   Int
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -206,6 +208,6 @@ enum OrderStatus {
 
 enum PaymentMethod {
   CASH
-  VISA
+  CARD
   WALLET
 }
