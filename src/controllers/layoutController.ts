@@ -26,22 +26,9 @@ export const changeWebsiteLayout = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { title, paragraph, contactEmail, contactPhoneNumber } = req.body;
-
   try {
-    if (!title && !paragraph && !contactEmail && !contactPhoneNumber) {
-      throw new AppError(
-        400,
-        "Please provide at least one field (title, paragraph, contactEmail, contactPhoneNumber)"
-      );
-    }
-    const address = await changeLayout({
-      title,
-      paragraph,
-      contactEmail,
-      contactPhoneNumber,
-    });
-    res.status(200).json(address);
+    const layout = await changeLayout(req.body);
+    res.status(200).json(layout);
   } catch (error) {
     next(error);
   }

@@ -1,33 +1,22 @@
 import prisma from "../utils/prismaClient";
 import resizeAndSaveImages from "../utils/resizeAndSaveImages";
+import { ChangeLayoutType } from "../validations/schemas/layoutSchema";
 
 export const getLayout = async () => {
   const address = await prisma.layout.findFirst();
   return address;
 };
 
-export const changeLayout = async (data: {
-  title?: string;
-  paragraph?: string;
-  contactEmail?: string;
-  contactPhoneNumber?: string;
-}) => {
-  const { title, paragraph, contactEmail, contactPhoneNumber } = data;
+export const changeLayout = async (data: ChangeLayoutType) => {
   const layout = await prisma.layout.upsert({
     where: {
       id: 1,
     },
     update: {
-      title,
-      paragraph,
-      contactEmail,
-      contactPhoneNumber,
+      ...data,
     },
     create: {
-      title,
-      paragraph,
-      contactEmail,
-      contactPhoneNumber,
+      ...data,
     },
   });
   return layout;
