@@ -12,12 +12,13 @@ import { uploadMultipleImages } from "../middlewares/uploadImageMiddleware";
 import {
   createProductValidation,
   deleteProductValidation,
+  getProductsValidation,
   updateProductValidation,
 } from "../validations/productValidation";
 
 const router = Router();
 
-router.get("/", getAllProducts);
+router.get("/", getProductsValidation, getAllProducts);
 router.get("/:id", getProductById);
 router.post(
   "/",

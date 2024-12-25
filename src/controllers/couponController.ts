@@ -74,7 +74,6 @@ export const createCoupon = async (
     if (isNaN(convertedDiscount)) {
       throw new AppError(400, "discount must be a valid number");
     }
-    const decimalDiscount = new Decimal(convertedDiscount); // Handles precise conversions
 
     if (isNaN(Date.parse(start))) {
       throw new AppError(400, "Invalid date for 'start'");
@@ -94,7 +93,7 @@ export const createCoupon = async (
 
     const coupon = await addCoupon({
       code,
-      discount: decimalDiscount,
+      discount: convertedDiscount,
       start: startDate,
       end: endDate,
       minPurchase,

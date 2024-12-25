@@ -1,11 +1,26 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, query } from "express";
 import { parse } from "valibot";
 import { AppError } from "../middlewares/AppError";
 import {
   CreateProductRequestSchema,
   DeleteProductRequestSchema,
+  GetProductsRequestSchema,
   UpdateProductRequestSchema,
 } from "./schemas/productSchema";
+
+export async function getProductsValidation(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) {
+  try {
+    const validatedData = parse(GetProductsRequestSchema, { query: req.query });
+    req.query = validatedData.query;
+    next();
+  } catch (error: any) {
+    next(new AppError(400, `Validation Error: ${error.message}`));
+  }
+}
 
 export async function createProductValidation(
   req: Request,

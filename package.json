@@ -10,9 +10,6 @@
     "db:push": "npx prisma db push",
     "db:studio": "npx prisma studio"
   },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",

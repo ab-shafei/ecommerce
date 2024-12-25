@@ -52,10 +52,10 @@ export const fetchCouponById = async (id: number) => {
 
 export const addCoupon = async (data: {
   code: string;
-  discount: Decimal;
+  discount: number;
   start: Date;
   end: Date;
-  minPurchase?: Decimal;
+  minPurchase?: number;
 }) => {
   const existingCoupon = await prisma.coupon.findFirst({
     where: { code: data.code },
@@ -75,7 +75,7 @@ export const modifyCoupon = async (
     discount?: number;
     start?: Date;
     end?: Date;
-    minPurchase?: Decimal;
+    minPurchase?: number;
   }
 ) => {
   const coupon = await prisma.coupon.findUnique({

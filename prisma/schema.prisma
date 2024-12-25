@@ -62,8 +62,8 @@ model Product {
   color              String[]
   size               String[]
   inStock            Boolean  @default(true)
-  price              Decimal
-  priceAfterDiscount Decimal?
+  price              Float
+  priceAfterDiscount Float?
   homePage           Boolean  @default(false)
   images             String[]
   dimensionsImages   String[]
@@ -80,9 +80,10 @@ model Product {
 
 model Cart {
   id                          Int     @id @default(autoincrement())
-  cartTotalPrice              Decimal @default(0)
-  cartTotalPriceAfterDiscount Decimal @default(0)
-
+  cartTotalPrice              Float @default(0)
+  cartTotalPriceAfterDiscount Float @default(0)
+  couponId                    Int?
+  discount                    Float?
   customerId String     @unique
   customer   User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
   items      CartItem[]
@@ -96,7 +97,7 @@ model CartItem {
   quantity           Int   
   color              String
   size               String
-  cartItemTotalPrice Decimal
+  cartItemTotalPrice Float
 
   cartId    Int
   cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
@@ -109,8 +110,8 @@ model CartItem {
 
 model Order {
   id                Int           @id @default(autoincrement())
-  total             Decimal
-  shipping          Decimal       @default(0)
+  total             Float
+  shipping          Float       @default(0)
   contactNumber     String
   status            OrderStatus?  @default(PROCESSING)
   paymentMethod     PaymentMethod @default(CASH)
@@ -136,7 +137,7 @@ model OrderItem {
   quantity  Int
   color     String
   size      String
-  price     Decimal
+  price     Float
   productId String 
   orderId   Int
 
@@ -150,10 +151,10 @@ model OrderItem {
 model Coupon {
   id            Int          @id @default(autoincrement())
   code          String       @unique
-  discount      Decimal
+  discount      Float
   start         DateTime
   end           DateTime
-  minPurchase   Decimal?
+  minPurchase   Float?
   numberOfUsage Int?         @default(0)
   status        CouponStatus @default(UNUSED)
 
@@ -177,6 +178,7 @@ model Layout {
   id                 Int      @id @default(autoincrement())
   title              String?
   paragraph          String?
+  color               String?
   returnPolicy       String?
   privacyPolicy      String?
   termsAndConditions String?

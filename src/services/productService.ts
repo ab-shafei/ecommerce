@@ -3,11 +3,35 @@ import { AppError } from "../middlewares/AppError";
 import resizeAndSaveImages from "../utils/resizeAndSaveImages";
 import {
   CreateProductType,
+  GetProductsType,
   UpdateProductType,
 } from "../validations/schemas/productSchema";
 
-export const fetchAllProducts = async () => {
-  return await prisma.product.findMany();
+export const fetchAllProducts = async (filter: GetProductsType) => {
+  const { categoryName, color, size, inStock } = filter;
+
+  const whereClause: any = {};
+
+  if (size) {
+    whereClause.size = { has: size };
+  }
+
+  if (color) {
+    whereClause.color = { has: color };
+  }
+
+  if (categoryName) {
+    whereClause.category = {
+      name: categoryName,
+    };
+  }
+
+  whereClause.inStock =
+    inStock === "true" ? true : inStock === "false" ? false : undefined;
+
+  return await prisma.product.findMany({
+    where: whereClause,
+  });
 };
 
 export const fetchProductById = async (id: string) => {

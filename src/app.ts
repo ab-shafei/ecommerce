@@ -25,7 +25,7 @@ import { notFound } from "./controllers/notFoundController";
 const app = express();
 
 // Middleware
-app.use("/api/images", express.static(path.join(__dirname, "../uploads")));
+app.use("/api/v1/images", express.static(path.join(__dirname, "../uploads")));
 app.use(express.json());
 app.use(
   cors({
@@ -38,19 +38,20 @@ app.use(cookieParser());
 app.use(morgan("combined"));
 
 // Authentication routes
-app.use("/api/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 // Routes
-app.use("/api/user", userRoutes);
-app.use("/api/category", categoryRoutes);
-app.use("/api/product", productRoutes);
-app.use("/api/cart", cartRoutes);
-app.use("/api/search", searchRoutes);
-app.use("/api/coupon", couponRoutes);
-app.use("/api/address", addressRoutes);
-app.use("/api/layout", layoutRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/acceptance", paymentRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/carts", cartRoutes);
+app.use("/api/v1/search", searchRoutes);
+app.use("/api/v1/coupons", couponRoutes);
+app.use("/api/v1/addresses", addressRoutes);
+app.use("/api/v1/layouts", layoutRoutes);
+app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/payments", paymentRoutes);
+
 // Error Handling
 app.use(errorHandler);
 

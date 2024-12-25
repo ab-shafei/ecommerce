@@ -38,6 +38,7 @@ export const processPayment = async (
     );
     return response.data;
   } catch (error) {
+    console.log(error);
     throw new Error("Payment processing failed");
   }
 };

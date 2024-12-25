@@ -12,12 +12,12 @@ import { AppError } from "../middlewares/AppError";
 const allowedUploadTypes = ["images", "dimensionsImages"];
 
 export const getAllProducts = async (
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const products = await fetchAllProducts();
+    const products = await fetchAllProducts(req.query);
     res.status(200).json(products);
   } catch (error) {
     next(error);

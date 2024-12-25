@@ -232,9 +232,8 @@ export const createOrder = async (
 
   const { cartTotalPrice, cartTotalPriceAfterDiscount } = cart;
 
-  const cartTotalPriceInNumber = cartTotalPrice.toNumber();
-  const cartTotalPriceAfterDiscountInNumber =
-    cartTotalPriceAfterDiscount.toNumber();
+  const cartTotalPriceInNumber = cartTotalPrice;
+  const cartTotalPriceAfterDiscountInNumber = cartTotalPriceAfterDiscount;
 
   const orderTotal =
     cartTotalPriceAfterDiscountInNumber > 0
@@ -255,8 +254,7 @@ export const createOrder = async (
           quantity: item.quantity,
           color: item.color,
           size: item.size,
-          price:
-            Math.round(item.product.price.toNumber() * 100) * item.quantity,
+          price: Math.round(item.product.price * 100) * item.quantity,
         })),
       };
       await handleCashPayment(
@@ -278,7 +276,7 @@ export const createOrder = async (
           quantity: item.quantity,
           color: item.color,
           size: item.size,
-          price: Math.round(item.product.price.toNumber() * 100),
+          price: Math.round(item.product.price * 100),
         })),
       };
       const paymentData = await handleOnlinePayment(

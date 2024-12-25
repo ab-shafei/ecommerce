@@ -1,39 +1,50 @@
 import {
   array,
   boolean,
-  decimal,
   object,
   pipe,
   string,
   optional,
   InferInput,
   uuid,
+  number,
 } from "valibot";
+
+export const GetProductsSchema = object({
+  categoryName: optional(string()),
+  color: optional(string()),
+  size: optional(string()),
+  inStock: optional(string()),
+});
 
 export const CreateProductSchema = object({
   name: string(),
   color: array(string()),
   size: array(string()),
-  price: pipe(string(), decimal()),
+  price: number(),
   inStock: optional(boolean(), true),
   homePage: optional(boolean(), false),
   categoryId: string(),
-  priceAfterDiscount: optional(pipe(string(), decimal())),
+  priceAfterDiscount: number(),
 });
 
 export const UpdateProductSchema = object({
   name: optional(string()),
   color: optional(array(string())),
   size: optional(array(string())),
-  price: optional(pipe(string(), decimal())),
+  price: number(),
   inStock: optional(boolean()),
   homePage: optional(boolean()),
   categoryId: optional(string()),
-  priceAfterDiscount: optional(pipe(string(), decimal())),
+  priceAfterDiscount: number(),
+});
+
+export const GetProductsRequestSchema = object({
+  query: GetProductsSchema,
 });
 
 export const CreateProductRequestSchema = object({
-  body: UpdateProductSchema,
+  body: CreateProductSchema,
 });
 
 export const UpdateProductRequestSchema = object({
@@ -49,5 +60,6 @@ export const DeleteProductRequestSchema = object({
   }),
 });
 
+export type GetProductsType = InferInput<typeof GetProductsSchema>;
 export type CreateProductType = InferInput<typeof CreateProductSchema>;
 export type UpdateProductType = InferInput<typeof UpdateProductSchema>;

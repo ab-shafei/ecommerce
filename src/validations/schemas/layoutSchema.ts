@@ -11,6 +11,7 @@ import {
 export const ChangeLayoutSchema = object({
   title: optional(string()),
   paragraph: optional(string()),
+  color: optional(string()),
   returnPolicy: optional(string()),
   privacyPolicy: optional(string()),
   termsAndConditions: optional(string()),
