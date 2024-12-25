@@ -86,7 +86,11 @@ export const addToCart = async (
   // Step 4: Calculate updated quantity and price
   const existingQuantity = existingCartItem?.quantity || 0;
   const updatedQuantity = existingQuantity + quantity;
-  const cartItemTotalPrice = product.price * updatedQuantity;
+
+  const productPrice = product.priceAfterDiscount
+    ? product.priceAfterDiscount
+    : product.price;
+  const cartItemTotalPrice = productPrice * updatedQuantity;
 
   // Step 5: Add or update the cart item
   const cartItem = await prisma.cartItem.upsert({
@@ -190,8 +194,10 @@ export const updateQuantity = async (
   if (!cartItem) {
     throw new AppError(404, "Cart item not found");
   }
-
-  const cartItemTotalPrice = cartItem.product.price * data.quantity;
+  const productPrice = cartItem.product.priceAfterDiscount
+    ? cartItem.product.priceAfterDiscount
+    : cartItem.product.price;
+  const cartItemTotalPrice = productPrice * data.quantity;
 
   // update the cart item
   const newCartItem = await prisma.cartItem.update({

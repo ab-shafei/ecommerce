@@ -32,11 +32,11 @@ export const UpdateProductSchema = object({
   name: optional(string()),
   color: optional(array(string())),
   size: optional(array(string())),
-  price: number(),
+  price: optional(number()),
   inStock: optional(boolean()),
   homePage: optional(boolean()),
   categoryId: optional(string()),
-  priceAfterDiscount: number(),
+  priceAfterDiscount: optional(number()),
 });
 
 export const GetProductsRequestSchema = object({
