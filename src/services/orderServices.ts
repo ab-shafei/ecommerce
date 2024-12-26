@@ -13,6 +13,8 @@ const handleCashPayment = async (
     customerId: string;
     addressId: number;
     contactNumber: string;
+    shippingAmount?: number;
+    shippingLocation?: string;
     items: {
       name: string;
       productId: string;
@@ -27,6 +29,8 @@ const handleCashPayment = async (
     data: {
       total,
       contactNumber: data.contactNumber,
+      shippingAmount: data.shippingAmount,
+      shippingLocation: data.shippingLocation,
       shippingAddressId: data.addressId,
       customerId: data.customerId,
       paymentMethod,
@@ -55,6 +59,8 @@ const handleCashPayment = async (
     data: {
       cartTotalPrice: 0,
       cartTotalPriceAfterDiscount: 0,
+      couponId: null,
+      discount: 0,
     },
   });
 };
@@ -67,6 +73,8 @@ const handleOnlinePayment = async (
     customerId: string;
     addressId: number;
     contactNumber: string;
+    shippingAmount?: number;
+    shippingLocation?: string;
     items: {
       name: string;
       productId: string;
@@ -77,12 +85,6 @@ const handleOnlinePayment = async (
     }[];
   }
 ) => {
-  const lineItems = data.items.map((item) => ({
-    name: item.name,
-    amount: item.price,
-    quantity: item.quantity,
-  }));
-
   const user = await prisma.user.findUnique({
     where: {
       id: data.customerId,
@@ -109,12 +111,7 @@ const handleOnlinePayment = async (
     email: user.email,
     state: user.address[0].region,
   };
-  const paymentResult = await processPayment(
-    paymentMethod,
-    total,
-    lineItems,
-    billingData
-  );
+  const paymentResult = await processPayment(paymentMethod, total, billingData);
   if (paymentResult.status !== "intended") {
     throw new AppError(400, "Payment processing failed");
   }
@@ -122,6 +119,8 @@ const handleOnlinePayment = async (
     data: {
       id: paymentResult.order_id,
       total,
+      shippingAmount: data.shippingAmount,
+      shippingLocation: data.shippingLocation,
       contactNumber: data.contactNumber,
       shippingAddressId: data.addressId,
       customerId: data.customerId,
@@ -153,6 +152,8 @@ const handleOnlinePayment = async (
     data: {
       cartTotalPrice: 0,
       cartTotalPriceAfterDiscount: 0,
+      couponId: null,
+      discount: 0,
     },
   });
 
@@ -191,13 +192,6 @@ export const getOrder = async (orderId: number) => {
   return order;
 };
 
-/**
- * Creates an order based on the provided data.
- *
- * @param {CreateOrderType} data - The data required to create an order, including customer ID, shipping address ID, contact number, and payment method.
- * @returns {Promise<void>} - A promise that resolves when the order is successfully created.
- * @throws {AppError} - Throws an error if the cart is not found, the cart is empty, the address is not found, or the payment method is invalid.
- */
 export const createOrder = async (
   customerId: string,
   data: CreateOrderType
@@ -233,15 +227,11 @@ export const createOrder = async (
     throw new AppError(404, "Address not found");
   }
 
-  const { cartTotalPrice, cartTotalPriceAfterDiscount } = cart;
-
-  const cartTotalPriceInNumber = cartTotalPrice;
+  const { cartTotalPriceAfterDiscount } = cart;
   const cartTotalPriceAfterDiscountInNumber = cartTotalPriceAfterDiscount;
 
   const orderTotal =
-    cartTotalPriceAfterDiscountInNumber > 0
-      ? cartTotalPriceAfterDiscountInNumber
-      : cartTotalPriceInNumber;
+    cartTotalPriceAfterDiscountInNumber + (data.shippingAmount || 0);
 
   const orderTotalInCents = Math.round(orderTotal * 100);
 
@@ -251,6 +241,8 @@ export const createOrder = async (
         customerId,
         addressId: address.id,
         contactNumber: data.contactNumber,
+        shippingAmount: data.shippingAmount,
+        shippingLocation: data.shippingLocation,
         items: cart.items.map((item) => ({
           name: item.product.name,
           productId: item.productId,
@@ -273,6 +265,8 @@ export const createOrder = async (
         customerId,
         addressId: address.id,
         contactNumber: data.contactNumber,
+        shippingAmount: data.shippingAmount,
+        shippingLocation: data.shippingLocation,
         items: cart.items.map((item) => ({
           name: item.product.name,
           productId: item.productId,

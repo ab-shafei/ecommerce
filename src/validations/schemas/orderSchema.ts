@@ -13,7 +13,8 @@ import {
 } from "valibot";
 
 export const CreateOrderSchema = object({
-  shipping: optional(pipe(string(), decimal())),
+  shippingAmount: optional(number("Shipping amount is invalid"), 0),
+  shippingLocation: optional(string("Shipping location is invalid")),
   contactNumber: pipe(
     string("Enter phone number"),
     regex(/^01\d{9}/, "Phone number must be 11 numbers starting with 01")

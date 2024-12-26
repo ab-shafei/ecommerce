@@ -8,35 +8,36 @@ import {
   InferInput,
   uuid,
   number,
+  check,
 } from "valibot";
 
 export const GetProductsSchema = object({
-  categoryName: optional(string()),
-  color: optional(string()),
-  size: optional(string()),
-  inStock: optional(string()),
+  categoryName: optional(string("Invalid category name")),
+  color: optional(string("Invalid color")),
+  size: optional(string("Invalid size")),
+  inStock: optional(string("Invalid inStock")),
 });
 
 export const CreateProductSchema = object({
-  name: string(),
-  color: array(string()),
-  size: array(string()),
-  price: number(),
-  inStock: optional(boolean(), true),
-  homePage: optional(boolean(), false),
-  categoryId: string(),
-  priceAfterDiscount: number(),
+  name: string("Invalid name"),
+  color: array(string("Invalid color")),
+  size: array(string("Invalid size")),
+  price: number("Invalid price"),
+  inStock: optional(boolean("Invalid inStock"), true),
+  homePage: optional(boolean("Invalid homPage"), false),
+  categoryId: string("Invalid categoryId"),
+  priceAfterDiscount: number("Invalid priceAfterDiscount"),
 });
 
 export const UpdateProductSchema = object({
-  name: optional(string()),
-  color: optional(array(string())),
-  size: optional(array(string())),
-  price: optional(number()),
-  inStock: optional(boolean()),
-  homePage: optional(boolean()),
-  categoryId: optional(string()),
-  priceAfterDiscount: optional(number()),
+  name: optional(string("Invalid name")),
+  color: optional(array(string("Invalid color"))),
+  size: optional(array(string("Invalid size"))),
+  price: optional(number("Invalid price")),
+  inStock: optional(boolean("Invalid inStock")),
+  homePage: optional(boolean("Invalid homePage")),
+  categoryId: optional(string("Invalid categoryId")),
+  priceAfterDiscount: optional(number("Invalid priceAfterDiscount")),
 });
 
 export const GetProductsRequestSchema = object({

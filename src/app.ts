@@ -46,13 +46,13 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/carts", cartRoutes);
-app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/coupons", couponRoutes);
 app.use("/api/v1/addresses", addressRoutes);
-app.use("/api/v1/layouts", layoutRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/search", searchRoutes);
+app.use("/api/v1/layout", layoutRoutes);
 
 // Error Handling
 app.use(errorHandler);

@@ -65,6 +65,14 @@ export const addProduct = async (data: CreateProductType) => {
   if (!categoryExist) {
     throw new AppError(409, "Product category doesn't exists");
   }
+
+  const { price, priceAfterDiscount } = data;
+  if (priceAfterDiscount && price < priceAfterDiscount) {
+    throw new AppError(409, "Price can't be less than priceAfterDiscount");
+  } else if (!priceAfterDiscount) {
+    data.priceAfterDiscount = price;
+  }
+
   const product = await prisma.product.create({ data });
 
   return product;
@@ -124,6 +132,11 @@ export const modifyProduct = async (id: string, data: UpdateProductType) => {
     if (!categoryExist) {
       throw new AppError(409, "Product category doesn't exists");
     }
+  }
+  const price = product.price;
+  const { priceAfterDiscount } = data;
+  if (priceAfterDiscount && price < priceAfterDiscount) {
+    throw new AppError(409, "Price can't be less than priceAfterDiscount");
   }
 
   return await prisma.product.update({

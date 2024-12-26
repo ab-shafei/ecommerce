@@ -40,15 +40,15 @@ const findExistingCartItem = async (cartId: number, productId: string) => {
   });
 };
 
-const calculateDiscount = async (
+const calculateCouponDiscount = async (
   couponId: number,
   cartTotalPrice: number,
   discount: number
 ) => {
   const discountAmount = cartTotalPrice * (discount / 100);
-  const totalPriceAfterDiscount = cartTotalPrice - discountAmount;
+  const totalPriceCouponAfterDiscount = cartTotalPrice - discountAmount;
 
-  return { discountAmount, totalPriceAfterDiscount };
+  return { discountAmount, totalPriceCouponAfterDiscount };
 };
 
 export const fetchUserCart = async (userId: string) => {
@@ -57,9 +57,7 @@ export const fetchUserCart = async (userId: string) => {
       customerId: userId,
     },
     include: {
-      items: {
-        include: { product: true },
-      },
+      items: true,
     },
   });
   if (!cart) {
@@ -87,10 +85,12 @@ export const addToCart = async (
   const existingQuantity = existingCartItem?.quantity || 0;
   const updatedQuantity = existingQuantity + quantity;
 
-  const productPrice = product.priceAfterDiscount
-    ? product.priceAfterDiscount
-    : product.price;
+  const productPrice = product.price;
+  const productPriceAfterDiscount = product.priceAfterDiscount;
+
   const cartItemTotalPrice = productPrice * updatedQuantity;
+  const cartItemTotalPriceAfterDiscount =
+    productPriceAfterDiscount * updatedQuantity;
 
   // Step 5: Add or update the cart item
   const cartItem = await prisma.cartItem.upsert({
@@ -101,6 +101,7 @@ export const addToCart = async (
     update: {
       quantity: updatedQuantity,
       cartItemTotalPrice,
+      cartItemTotalPriceAfterDiscount,
       size,
       color,
     },
@@ -111,17 +112,23 @@ export const addToCart = async (
       color,
       quantity,
       cartItemTotalPrice,
+      cartItemTotalPriceAfterDiscount,
     },
   });
 
   // Step 6: Recalculate and update the cart's total price
   const cartItems = await prisma.cartItem.findMany({
     where: { cartId: cart.id },
-    select: { cartItemTotalPrice: true },
+    select: { cartItemTotalPrice: true, cartItemTotalPriceAfterDiscount: true },
   });
 
   const cartTotalPrice = cartItems.reduce(
     (acc, item) => acc + item.cartItemTotalPrice,
+    0
+  );
+
+  const cartTotalPriceAfterDiscount = cartItems.reduce(
+    (acc, item) => acc + item.cartItemTotalPriceAfterDiscount,
     0
   );
 
@@ -132,17 +139,18 @@ export const addToCart = async (
     if (!coupon) {
       throw new AppError(404, "Coupon not found");
     }
-    const { totalPriceAfterDiscount, discountAmount } = await calculateDiscount(
-      cart.couponId,
-      cartTotalPrice,
-      coupon.discount
-    );
+    const { totalPriceCouponAfterDiscount, discountAmount } =
+      await calculateCouponDiscount(
+        cart.couponId,
+        cartTotalPriceAfterDiscount,
+        coupon.discount
+      );
 
     await prisma.cart.update({
       where: { id: cart.id },
       data: {
         cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceAfterDiscount,
+        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
         discount: discountAmount,
       },
     });
@@ -150,7 +158,7 @@ export const addToCart = async (
       cart: {
         ...cart,
         cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceAfterDiscount,
+        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
         discountAmount,
       },
       cartItem,
@@ -159,14 +167,14 @@ export const addToCart = async (
 
   await prisma.cart.update({
     where: { id: cart.id },
-    data: { cartTotalPrice, cartTotalPriceAfterDiscount: cartTotalPrice },
+    data: { cartTotalPrice, cartTotalPriceAfterDiscount },
   });
 
   return {
     cart: {
       ...cart,
       cartTotalPrice,
-      cartTotalPriceAfterDiscount: cartTotalPrice,
+      cartTotalPriceAfterDiscount,
     },
     cartItem,
   };
@@ -194,25 +202,36 @@ export const updateQuantity = async (
   if (!cartItem) {
     throw new AppError(404, "Cart item not found");
   }
-  const productPrice = cartItem.product.priceAfterDiscount
-    ? cartItem.product.priceAfterDiscount
-    : cartItem.product.price;
+  const productPrice = cartItem.product.price;
+  const productPriceAfterDiscount = cartItem.product.priceAfterDiscount;
+
   const cartItemTotalPrice = productPrice * data.quantity;
+  const cartItemTotalPriceAfterDiscount =
+    productPriceAfterDiscount * data.quantity;
 
   // update the cart item
   const newCartItem = await prisma.cartItem.update({
     where: { productId: data.productId },
-    data: { quantity: data.quantity, cartItemTotalPrice },
+    data: {
+      quantity: data.quantity,
+      cartItemTotalPrice,
+      cartItemTotalPriceAfterDiscount,
+    },
   });
 
   // recalculate and update the cart
   const cartItems = await prisma.cartItem.findMany({
     where: { cartId: cart.id },
-    select: { cartItemTotalPrice: true },
+    select: { cartItemTotalPrice: true, cartItemTotalPriceAfterDiscount: true },
   });
 
   const cartTotalPrice = cartItems.reduce(
     (acc, item) => acc + item.cartItemTotalPrice,
+    0
+  );
+
+  const cartTotalPriceAfterDiscount = cartItems.reduce(
+    (acc, item) => acc + item.cartItemTotalPriceAfterDiscount,
     0
   );
 
@@ -223,17 +242,18 @@ export const updateQuantity = async (
     if (!coupon) {
       throw new AppError(404, "Coupon not found");
     }
-    const { totalPriceAfterDiscount, discountAmount } = await calculateDiscount(
-      cart.couponId,
-      cartTotalPrice,
-      coupon.discount
-    );
+    const { totalPriceCouponAfterDiscount, discountAmount } =
+      await calculateCouponDiscount(
+        cart.couponId,
+        cartTotalPriceAfterDiscount,
+        coupon.discount
+      );
 
     await prisma.cart.update({
       where: { id: cart.id },
       data: {
         cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceAfterDiscount,
+        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
         discount: discountAmount,
       },
     });
@@ -241,7 +261,7 @@ export const updateQuantity = async (
       cart: {
         ...cart,
         cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceAfterDiscount,
+        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
         discountAmount,
       },
       newCartItem,
@@ -250,14 +270,14 @@ export const updateQuantity = async (
 
   await prisma.cart.update({
     where: { id: cart.id },
-    data: { cartTotalPrice, cartTotalPriceAfterDiscount: cartTotalPrice },
+    data: { cartTotalPrice, cartTotalPriceAfterDiscount },
   });
 
   return {
     cart: {
       ...cart,
       cartTotalPrice,
-      cartTotalPriceAfterDiscount: cartTotalPrice,
+      cartTotalPriceAfterDiscount,
     },
     newCartItem,
   };
@@ -304,11 +324,11 @@ export const applyCoupon = async ({
     },
   });
 
-  if (!cart?.cartTotalPrice) {
+  if (!cart) {
     throw new AppError(404, "No cart found for this user");
   }
 
-  const { cartTotalPrice } = cart;
+  const { cartTotalPrice, cartTotalPriceAfterDiscount } = cart;
   const { minPurchase } = coupon;
 
   if (minPurchase && cartTotalPrice < minPurchase) {
@@ -319,11 +339,12 @@ export const applyCoupon = async ({
   }
 
   // calculate discount
-  const { totalPriceAfterDiscount, discountAmount } = await calculateDiscount(
-    coupon.id,
-    cartTotalPrice,
-    coupon.discount
-  );
+  const { totalPriceCouponAfterDiscount, discountAmount } =
+    await calculateCouponDiscount(
+      coupon.id,
+      cartTotalPriceAfterDiscount,
+      coupon.discount
+    );
 
   //do all operations in a $transaction
   const [cartAfterDiscount, updatedCoupon, newUsage] =
@@ -333,7 +354,7 @@ export const applyCoupon = async ({
           customerId,
         },
         data: {
-          cartTotalPriceAfterDiscount: totalPriceAfterDiscount,
+          cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
           couponId: coupon.id,
           discount: discountAmount,
         },
@@ -389,11 +410,16 @@ export const removeFromCart = async (
   // Step 6: Recalculate and update the cart's total price
   const cartItems = await prisma.cartItem.findMany({
     where: { cartId: cart.id },
-    select: { cartItemTotalPrice: true },
+    select: { cartItemTotalPrice: true, cartItemTotalPriceAfterDiscount: true },
   });
 
   const cartTotalPrice = cartItems.reduce(
     (acc, item) => acc + item.cartItemTotalPrice,
+    0
+  );
+
+  const cartTotalPriceAfterDiscount = cartItems.reduce(
+    (acc, item) => acc + item.cartItemTotalPriceAfterDiscount,
     0
   );
 
@@ -404,17 +430,18 @@ export const removeFromCart = async (
     if (!coupon) {
       throw new AppError(404, "Coupon not found");
     }
-    const { totalPriceAfterDiscount, discountAmount } = await calculateDiscount(
-      cart.couponId,
-      cartTotalPrice,
-      coupon.discount
-    );
+    const { totalPriceCouponAfterDiscount, discountAmount } =
+      await calculateCouponDiscount(
+        cart.couponId,
+        cartTotalPrice,
+        coupon.discount
+      );
 
     await prisma.cart.update({
       where: { id: cart.id },
       data: {
         cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceAfterDiscount,
+        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
         discount: discountAmount,
       },
     });
@@ -422,7 +449,7 @@ export const removeFromCart = async (
       cart: {
         ...cart,
         cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceAfterDiscount,
+        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
         discountAmount,
       },
       cartItem,
@@ -431,14 +458,14 @@ export const removeFromCart = async (
 
   await prisma.cart.update({
     where: { id: cart.id },
-    data: { cartTotalPrice, cartTotalPriceAfterDiscount: cartTotalPrice },
+    data: { cartTotalPrice, cartTotalPriceAfterDiscount },
   });
 
   return {
     cart: {
       ...cart,
       cartTotalPrice,
-      cartTotalPriceAfterDiscount: cartTotalPrice,
+      cartTotalPriceAfterDiscount,
     },
     cartItem,
   };

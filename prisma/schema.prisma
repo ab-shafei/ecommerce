@@ -65,7 +65,7 @@ model Product {
   size               String[]
   inStock            Boolean  @default(true)
   price              Float
-  priceAfterDiscount Float?
+  priceAfterDiscount Float
   homePage           Boolean  @default(false)
   images             String[]
   dimensionsImages   String[]
@@ -102,6 +102,7 @@ model CartItem {
   color              String
   size               String
   cartItemTotalPrice Float
+  cartItemTotalPriceAfterDiscount Float
 
   cartId    Int
   cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
@@ -115,7 +116,8 @@ model CartItem {
 model Order {
   id                Int           @id @default(autoincrement())
   total             Float
-  shipping          Float       @default(0)
+  shippingAmount    Float         @default(0)
+  shippingLocation  String?
   contactNumber     String
   status            OrderStatus?  @default(PROCESSING)
   paymentMethod     PaymentMethod @default(CASH)

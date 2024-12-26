@@ -1,4 +1,4 @@
-import { Address, OrderItem, PaymentMethod } from "@prisma/client";
+import { PaymentMethod } from "@prisma/client";
 import axios from "axios";
 import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
@@ -6,7 +6,6 @@ import { AppError } from "../middlewares/AppError";
 export const processPayment = async (
   paymentMethod: PaymentMethod,
   amount: number,
-  lineItems: { name: string; amount: number; quantity: number }[],
   billingData: {
     first_name: string;
     last_name: string;
@@ -19,16 +18,14 @@ export const processPayment = async (
 ) => {
   try {
     const response = await axios.post(
-      "https://accept.paymob.com/v1/intention/",
+      `${process.env.PAYMOB_API_URL}/intention`,
       {
         amount,
         currency: "EGP",
         payment_methods: [paymentMethod],
-        items: lineItems,
-        extras: {
-          ee: 22,
-        },
         billing_data: billingData,
+        notification_url: `${process.env.API_URL}/payments/acceptance/post_pay`,
+        redirection_url: `${process.env.CLIENT_URL}/payments/acceptance/post_pay`,
       },
       {
         headers: {
