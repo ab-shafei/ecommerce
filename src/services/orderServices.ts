@@ -163,7 +163,9 @@ const handleOnlinePayment = async (
 };
 
 export const getOrders = async () => {
-  const orders = await prisma.order.findMany();
+  const orders = await prisma.order.findMany({
+    include: { items: true },
+  });
 
   return orders;
 };
@@ -173,6 +175,7 @@ export const getUserOrders = async (userId: string) => {
     where: {
       customerId: userId,
     },
+    include: { items: true },
   });
 
   return order;
