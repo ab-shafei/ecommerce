@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { errorHandler } from "./middlewares/errorHandler";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -37,6 +37,11 @@ app.use(bodyParser.json());
 app.use(compression());
 app.use(cookieParser());
 app.use(morgan("combined"));
+
+// welcoming
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).send("Welcome to taline api");
+});
 
 // Authentication routes
 app.use("/api/v1/auth", authRoutes);
