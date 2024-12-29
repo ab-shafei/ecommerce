@@ -57,7 +57,11 @@ export const fetchUserCart = async (userId: string) => {
       customerId: userId,
     },
     include: {
-      items: true,
+      items: {
+        include: {
+          product: true,
+        },
+      },
     },
   });
   if (!cart) {
