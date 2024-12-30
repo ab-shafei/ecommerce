@@ -41,7 +41,7 @@ export const getOrderById = async (
   next: NextFunction
 ) => {
   try {
-    const convertedOrderId = parseInt(req.params.orderId, 10);
+    const convertedOrderId = parseInt(req.params.id, 10);
 
     const order = await getOrder(convertedOrderId);
     res.status(200).json(order);
