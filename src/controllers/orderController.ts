@@ -5,9 +5,10 @@ import {
   getUserOrders,
   getOrder,
   createOrder,
-  // updateOrder,
-  // deleteOrder,
+  updateOrder,
+  deleteOrder,
 } from "../services/orderServices";
+import { AppError } from "../middlewares/AppError";
 
 export const getAllOrders = async (
   req: AuthenticatedRequest,
@@ -65,59 +66,40 @@ export const createUserOrder = async (
   }
 };
 
-// export const updateUserOrder = async (
-//   req: AuthenticatedRequest,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const { id: userId } = req.user!;
-//   const { orderId } = req.params;
-//   const { name, phoneNumber, city, region, orderLine1, orderLine2, isDefault } =
-//     req.body;
+export const updateUserOrder = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id: orderId } = req.params;
 
-//   try {
-//     const convertedOrderId = parseInt(orderId, 10);
-//     if (isNaN(convertedOrderId)) {
-//       throw new AppError(400, "Invalid order ID");
-//     }
+  try {
+    const convertedOrderId = parseInt(orderId, 10);
+    if (isNaN(convertedOrderId)) {
+      throw new AppError(400, "Invalid order ID");
+    }
+    const order = await updateOrder(convertedOrderId, req.body);
+    res.status(200).json(order);
+  } catch (error) {
+    next(error);
+  }
+};
 
-//     if (phoneNumber && !validatePhoneNumber(phoneNumber)) {
-//       throw new AppError(
-//         400,
-//         'Invalid phone number format. It should start with "+" and include 10-15 digits'
-//       );
-//     }
-//     const order = await updateOrder(userId, convertedOrderId, {
-//       name,
-//       phoneNumber,
-//       city,
-//       region,
-//       orderLine1,
-//       orderLine2,
-//       isDefault,
-//     });
-//     res.status(201).json(order);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const deleteUserOrder = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { orderId } = req.params;
 
-// export const deleteUserOrder = async (
-//   req: AuthenticatedRequest,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const { id: userId } = req.user!;
-//   const { orderId } = req.params;
-
-//   try {
-//     const convertedOrderId = parseInt(orderId, 10);
-//     if (isNaN(convertedOrderId)) {
-//       throw new AppError(400, "Invalid order ID");
-//     }
-//     const order = await deleteOrder(userId, convertedOrderId);
-//     res.status(200).json(order);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+  try {
+    const convertedOrderId = parseInt(orderId, 10);
+    if (isNaN(convertedOrderId)) {
+      throw new AppError(400, "Invalid order ID");
+    }
+    const order = await deleteOrder(convertedOrderId);
+    res.status(200).json(order);
+  } catch (error) {
+    next(error);
+  }
+};

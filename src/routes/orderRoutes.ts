@@ -4,11 +4,14 @@ import {
   getLoggedUserOrders,
   getOrderById,
   createUserOrder,
-  // updateUserOrder,
-  // deleteUserOrder,
+  updateUserOrder,
+  deleteUserOrder,
 } from "../controllers/orderController";
 import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
-import { createOrderValidation } from "../validations/orderValidation";
+import {
+  createOrderValidation,
+  updateOrderValidation,
+} from "../validations/orderValidation";
 
 const router = Router();
 
@@ -38,16 +41,17 @@ router.post(
 
 router.put(
   "/:id",
+  updateOrderValidation,
   authenticateJWT,
-  authorizeRoles("CUSTOMER", "ADMIN")
-  // updateUserOrder
+  authorizeRoles("ADMIN"),
+  updateUserOrder
 );
 
-// router.delete(
-//   "/:id",
-//   authenticateJWT,
-//   authorizeRoles("CUSTOMER", "ADMIN"),
-//   deleteUserOrder
-// );
+router.delete(
+  "/:id",
+  authenticateJWT,
+  authorizeRoles("ADMIN"),
+  deleteUserOrder
+);
 
 export default router;

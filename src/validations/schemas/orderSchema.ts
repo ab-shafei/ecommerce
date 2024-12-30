@@ -1,6 +1,5 @@
 import { OrderStatus, PaymentMethod } from "@prisma/client";
 import {
-  decimal,
   object,
   pipe,
   string,
@@ -10,6 +9,7 @@ import {
   enum as venum,
   number,
   date,
+  boolean,
 } from "valibot";
 
 export const CreateOrderSchema = object({
@@ -24,23 +24,10 @@ export const CreateOrderSchema = object({
 });
 
 export const UpdateOrderSchema = object({
-  totalAmount: optional(pipe(string(), decimal())),
-  supTotal: optional(pipe(string(), decimal())),
-  shipping: optional(pipe(string(), decimal())),
-  discount: optional(pipe(string(), decimal())),
-  total: optional(pipe(string(), decimal())),
-  contactNumber: optional(
-    pipe(
-      string("Enter phone number"),
-      regex(/^01\d{9}/, "Phone number must be 11 numbers starting with 01")
-    )
-  ),
   status: optional(venum(OrderStatus, "Invalid Order Status")),
-  paymentMethod: optional(venum(PaymentMethod, "Invalid Payment Method")),
   trackingNumber: optional(string()),
   estimatedDelivery: optional(date()),
-  deliveredAt: optional(date()),
-  shippingAddressId: optional(number()),
+  paid: optional(boolean()),
 });
 
 export const CreateOrderRequestSchema = object({

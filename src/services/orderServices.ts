@@ -1,6 +1,9 @@
 import { PaymentMethod, PrismaClient } from "@prisma/client";
 import { processPayment } from "../services/paymentService";
-import { CreateOrderType } from "../validations/schemas/orderSchema";
+import {
+  CreateOrderType,
+  UpdateOrderType,
+} from "../validations/schemas/orderSchema";
 import { AppError } from "../middlewares/AppError";
 
 const prisma = new PrismaClient();
@@ -189,6 +192,9 @@ export const getOrder = async (orderId: number) => {
     },
   });
 
+  if (!order) {
+    throw new AppError(404, "Order not found");
+  }
   return order;
 };
 
@@ -286,4 +292,45 @@ export const createOrder = async (
     default:
       throw new AppError(400, "Invalid Payment Method");
   }
+};
+
+export const updateOrder = async (orderId: number, data: UpdateOrderType) => {
+  const existingOrder = await prisma.order.findUnique({
+    where: {
+      id: orderId,
+    },
+  });
+
+  if (!existingOrder) {
+    throw new AppError(404, "Order not found");
+  }
+
+  const order = await prisma.order.update({
+    where: {
+      id: orderId,
+    },
+    data,
+  });
+
+  return order;
+};
+
+export const deleteOrder = async (orderId: number) => {
+  const existingOrder = await prisma.order.findUnique({
+    where: {
+      id: orderId,
+    },
+  });
+
+  if (!existingOrder) {
+    throw new AppError(404, "Order not found");
+  }
+
+  const order = await prisma.order.delete({
+    where: {
+      id: orderId,
+    },
+  });
+
+  return order;
 };
