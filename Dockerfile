@@ -18,4 +18,4 @@ RUN npx tsc
 EXPOSE 4000
 
 # Use the entrypoint script
-CMD ["npm", "start"]
+CMD ["npm", "run" ,"start"]
