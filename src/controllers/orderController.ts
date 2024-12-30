@@ -44,6 +44,10 @@ export const getOrderById = async (
   try {
     const convertedOrderId = parseInt(req.params.id, 10);
 
+    if (isNaN(convertedOrderId)) {
+      throw new AppError(400, "Invalid order ID");
+    }
+
     const order = await getOrder(convertedOrderId);
     res.status(200).json(order);
   } catch (error) {

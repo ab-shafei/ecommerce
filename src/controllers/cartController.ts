@@ -58,13 +58,20 @@ export const updateProductQuantity = async (
 ) => {
   try {
     const customerId = req.user!.id;
-    const { productId } = req.params;
+    const { cartItemId } = req.params;
     const { quantity } = req.body;
 
-    const cart = await updateQuantity(customerId, {
-      productId,
-      quantity,
-    });
+    const convertedCartItemId = parseInt(cartItemId, 10);
+
+    if (isNaN(convertedCartItemId)) {
+      throw new AppError(400, "Invalid order ID");
+    }
+
+    const cart = await updateQuantity(
+      customerId,
+      convertedCartItemId,
+      quantity
+    );
 
     res.status(200).json(cart);
   } catch (error) {
@@ -99,9 +106,16 @@ export const deleteProductFromCart = async (
 ) => {
   try {
     const customerId = req.user!.id;
-    const { productId } = req.params;
+    const { cartItemId } = req.params;
 
-    await removeFromCart(customerId, { productId });
+    const convertedCartItemId = parseInt(cartItemId, 10);
+
+    if (isNaN(convertedCartItemId)) {
+      throw new AppError(400, "Invalid order ID");
+    }
+
+    await removeFromCart(customerId, convertedCartItemId);
+
     res.status(204).send();
   } catch (error) {
     next(error);

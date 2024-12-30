@@ -20,13 +20,13 @@ router.put(
   applyCouponToUserCart
 );
 router.put(
-  "/:productId",
+  "/:cartItemId",
   authenticateJWT,
   authorizeRoles("CUSTOMER"),
   updateProductQuantity
 );
 router.delete(
-  "/:productId",
+  "/:cartItemId",
   authenticateJWT,
   authorizeRoles("CUSTOMER"),
   deleteProductFromCart
