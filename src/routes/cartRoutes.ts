@@ -13,12 +13,12 @@ const router = Router();
 
 router.get("/", authenticateJWT, authorizeRoles("CUSTOMER"), getUserCart);
 router.post("/", authenticateJWT, authorizeRoles("CUSTOMER"), addProductToCart);
-router.put(
-  "/applyCoupon",
-  authenticateJWT,
-  authorizeRoles("CUSTOMER"),
-  applyCouponToUserCart
-);
+// router.put(
+//   "/applyCoupon",
+//   authenticateJWT,
+//   authorizeRoles("CUSTOMER"),
+//   applyCouponToUserCart
+// );
 router.put(
   "/:cartItemId",
   authenticateJWT,

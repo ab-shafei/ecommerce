@@ -159,37 +159,37 @@ export const addToCart = async (
     0
   );
 
-  if (cart.couponId) {
-    const coupon = await prisma.coupon.findUnique({
-      where: { id: cart.couponId },
-    });
-    if (!coupon) {
-      throw new AppError(404, "Coupon not found");
-    }
-    const { totalPriceCouponAfterDiscount, discountAmount } =
-      await calculateCouponDiscount(
-        cartTotalPriceAfterDiscount,
-        coupon.discount
-      );
+  // if (cart.couponId) {
+  //   const coupon = await prisma.coupon.findUnique({
+  //     where: { id: cart.couponId },
+  //   });
+  //   if (!coupon) {
+  //     throw new AppError(404, "Coupon not found");
+  //   }
+  //   const { totalPriceCouponAfterDiscount, discountAmount } =
+  //     await calculateCouponDiscount(
+  //       cartTotalPriceAfterDiscount,
+  //       coupon.discount
+  //     );
 
-    await prisma.cart.update({
-      where: { id: cart.id },
-      data: {
-        cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
-        discount: discountAmount,
-      },
-    });
-    return {
-      cart: {
-        ...cart,
-        cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
-        discountAmount,
-      },
-      cartItem,
-    };
-  }
+  //   await prisma.cart.update({
+  //     where: { id: cart.id },
+  //     data: {
+  //       cartTotalPrice,
+  //       cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
+  //       discount: discountAmount,
+  //     },
+  //   });
+  //   return {
+  //     cart: {
+  //       ...cart,
+  //       cartTotalPrice,
+  //       cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
+  //       discountAmount,
+  //     },
+  //     cartItem,
+  //   };
+  // }
 
   await prisma.cart.update({
     where: { id: cart.id },
@@ -260,37 +260,37 @@ export const updateQuantity = async (
     0
   );
 
-  if (cart.couponId) {
-    const coupon = await prisma.coupon.findUnique({
-      where: { id: cart.couponId },
-    });
-    if (!coupon) {
-      throw new AppError(404, "Coupon not found");
-    }
-    const { totalPriceCouponAfterDiscount, discountAmount } =
-      await calculateCouponDiscount(
-        cartTotalPriceAfterDiscount,
-        coupon.discount
-      );
+  // if (cart.couponId) {
+  //   const coupon = await prisma.coupon.findUnique({
+  //     where: { id: cart.couponId },
+  //   });
+  //   if (!coupon) {
+  //     throw new AppError(404, "Coupon not found");
+  //   }
+  //   const { totalPriceCouponAfterDiscount, discountAmount } =
+  //     await calculateCouponDiscount(
+  //       cartTotalPriceAfterDiscount,
+  //       coupon.discount
+  //     );
 
-    await prisma.cart.update({
-      where: { id: cart.id },
-      data: {
-        cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
-        discount: discountAmount,
-      },
-    });
-    return {
-      cart: {
-        ...cart,
-        cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
-        discountAmount,
-      },
-      newCartItem,
-    };
-  }
+  //   await prisma.cart.update({
+  //     where: { id: cart.id },
+  //     data: {
+  //       cartTotalPrice,
+  //       cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
+  //       discount: discountAmount,
+  //     },
+  //   });
+  //   return {
+  //     cart: {
+  //       ...cart,
+  //       cartTotalPrice,
+  //       cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
+  //       discountAmount,
+  //     },
+  //     newCartItem,
+  //   };
+  // }
 
   await prisma.cart.update({
     where: { id: cart.id },
@@ -441,34 +441,34 @@ export const removeFromCart = async (
     0
   );
 
-  if (cart.couponId) {
-    const coupon = await prisma.coupon.findUnique({
-      where: { id: cart.couponId },
-    });
-    if (!coupon) {
-      throw new AppError(404, "Coupon not found");
-    }
-    const { totalPriceCouponAfterDiscount, discountAmount } =
-      await calculateCouponDiscount(cartTotalPrice, coupon.discount);
+  // if (cart.couponId) {
+  //   const coupon = await prisma.coupon.findUnique({
+  //     where: { id: cart.couponId },
+  //   });
+  //   if (!coupon) {
+  //     throw new AppError(404, "Coupon not found");
+  //   }
+  //   const { totalPriceCouponAfterDiscount, discountAmount } =
+  //     await calculateCouponDiscount(cartTotalPrice, coupon.discount);
 
-    await prisma.cart.update({
-      where: { id: cart.id },
-      data: {
-        cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
-        discount: discountAmount,
-      },
-    });
-    return {
-      cart: {
-        ...cart,
-        cartTotalPrice,
-        cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
-        discountAmount,
-      },
-      cartItem,
-    };
-  }
+  //   await prisma.cart.update({
+  //     where: { id: cart.id },
+  //     data: {
+  //       cartTotalPrice,
+  //       cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
+  //       discount: discountAmount,
+  //     },
+  //   });
+  //   return {
+  //     cart: {
+  //       ...cart,
+  //       cartTotalPrice,
+  //       cartTotalPriceAfterDiscount: totalPriceCouponAfterDiscount,
+  //       discountAmount,
+  //     },
+  //     cartItem,
+  //   };
+  // }
 
   await prisma.cart.update({
     where: { id: cart.id },
