@@ -11,8 +11,8 @@ const prisma = new PrismaClient();
 const handleCashPayment = async (
   paymentMethod: PaymentMethod,
   cartId: number,
-  total: number,
   data: {
+    orderTotal: number;
     customerId: string;
     addressId: number;
     contactNumber: string;
@@ -25,12 +25,13 @@ const handleCashPayment = async (
       color: string;
       size: string;
       price: number;
+      priceAfterDiscount: number;
     }[];
   }
 ) => {
   const order = await prisma.order.create({
     data: {
-      total,
+      total: data.orderTotal,
       contactNumber: data.contactNumber,
       shippingAmount: data.shippingAmount,
       shippingLocation: data.shippingLocation,
@@ -71,8 +72,8 @@ const handleCashPayment = async (
 const handleOnlinePayment = async (
   paymentMethod: PaymentMethod,
   cartId: number,
-  total: number,
   data: {
+    orderTotal: number;
     customerId: string;
     addressId: number;
     contactNumber: string;
@@ -85,6 +86,7 @@ const handleOnlinePayment = async (
       color: string;
       size: string;
       price: number;
+      priceAfterDiscount: number;
     }[];
   }
 ) => {
@@ -114,14 +116,21 @@ const handleOnlinePayment = async (
     email: user.email,
     state: user.address[0].region,
   };
-  const paymentResult = await processPayment(paymentMethod, total, billingData);
+
+  const orderTotalInCents = Math.round(data.orderTotal * 100);
+
+  const paymentResult = await processPayment(
+    paymentMethod,
+    orderTotalInCents,
+    billingData
+  );
   if (paymentResult.status !== "intended") {
     throw new AppError(400, "Payment processing failed");
   }
   const order = await prisma.order.create({
     data: {
       id: paymentResult.order_id,
-      total,
+      total: data.orderTotal,
       shippingAmount: data.shippingAmount,
       shippingLocation: data.shippingLocation,
       contactNumber: data.contactNumber,
@@ -270,11 +279,10 @@ export const createOrder = async (
   const orderTotal =
     cartTotalPriceAfterDiscountInNumber + (data.shippingAmount || 0);
 
-  const orderTotalInCents = Math.round(orderTotal * 100);
-
   switch (data.paymentMethod) {
     case "CASH":
       const cashData = {
+        orderTotal,
         customerId,
         addressId: address.id,
         contactNumber: data.contactNumber,
@@ -286,19 +294,16 @@ export const createOrder = async (
           quantity: item.quantity,
           color: item.color,
           size: item.size,
-          price: Math.round(item.product.price * 100) * item.quantity,
+          price: Math.round(item.cartItemTotalPrice),
+          priceAfterDiscount: Math.round(item.cartItemTotalPriceAfterDiscount),
         })),
       };
-      await handleCashPayment(
-        data.paymentMethod,
-        cart.id,
-        orderTotalInCents,
-        cashData
-      );
+      await handleCashPayment(data.paymentMethod, cart.id, cashData);
       break;
     case "CARD":
     case "WALLET":
       const payMobData = {
+        orderTotal,
         customerId,
         addressId: address.id,
         contactNumber: data.contactNumber,
@@ -310,13 +315,13 @@ export const createOrder = async (
           quantity: item.quantity,
           color: item.color,
           size: item.size,
-          price: Math.round(item.product.price * 100),
+          price: Math.round(item.cartItemTotalPrice),
+          priceAfterDiscount: Math.round(item.cartItemTotalPriceAfterDiscount),
         })),
       };
       const paymentData = await handleOnlinePayment(
         data.paymentMethod,
         cart.id,
-        orderTotalInCents,
         payMobData
       );
       return paymentData;

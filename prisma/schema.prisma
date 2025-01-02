@@ -144,6 +144,7 @@ model OrderItem {
   color     String
   size      String
   price     Float
+  priceAfterDiscount Float
   productId String 
   orderId   Int
 
