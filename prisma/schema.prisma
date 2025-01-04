@@ -145,7 +145,7 @@ model Order {
   customerId        String       
   shippingAddressId Int
   paymentIntentId   String?
-  payMobOrderId     Int?
+  payMobOrderId     Int?      @unique
   customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
   shippingAddress Address     @relation(fields: [shippingAddressId], references: [id])
   items           OrderItem[]

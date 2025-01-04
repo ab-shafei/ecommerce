@@ -4,7 +4,7 @@ import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
 
 export const processPayment = async (
-  paymentMethod: PaymentMethod,
+  paymobIntegrationId: number,
   amount: number,
   billingData: {
     first_name: string;
@@ -22,7 +22,7 @@ export const processPayment = async (
       {
         amount,
         currency: "EGP",
-        payment_methods: [paymentMethod],
+        payment_methods: [paymobIntegrationId],
         billing_data: billingData,
         notification_url: `${process.env.API_URL}/payments/acceptance/post_pay`,
         redirection_url: `${process.env.CLIENT_URL}/payments/acceptance/post_pay`,
@@ -41,7 +41,7 @@ export const processPayment = async (
 };
 
 export const processPaymentPostPay = async (
-  success: string,
+  success: boolean,
   orderId: number
 ) => {
   const order = await prisma.order.findFirst({
@@ -54,10 +54,10 @@ export const processPaymentPostPay = async (
 
   // Update the order status based on the payment result
   await prisma.order.update({
-    where: { id: Number(orderId) },
+    where: { payMobOrderId: orderId },
     data: {
-      status: success === "true" ? "PAID" : "FAILED",
-      paid: success === "true",
+      status: success === true ? "PAID" : "FAILED",
+      paid: success === true,
     },
   });
 };

@@ -7,10 +7,10 @@ export const paymentPostPay = async (
   next: NextFunction
 ) => {
   console.log(req.body);
-  const { success, order: orderId } = req.body;
+  const { success, order } = req.body.obj;
 
   try {
-    await processPaymentPostPay(success, orderId);
+    await processPaymentPostPay(success, order.id);
 
     res.status(200).json({ message: "Payment status updated successfully" });
   } catch (error) {

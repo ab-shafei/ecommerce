@@ -5,6 +5,7 @@ import {
   UpdateOrderType,
 } from "../validations/schemas/orderSchema";
 import { AppError } from "../middlewares/AppError";
+import { getPaymobIntegrationId } from "../utils/payMob";
 
 const prisma = new PrismaClient();
 
@@ -107,6 +108,10 @@ const handleOnlinePayment = async (
     throw new AppError(404, "User not found");
   }
 
+  if (!user.address || user.address.length === 0) {
+    throw new AppError(400, "Address not found");
+  }
+
   const billingData = {
     first_name: user.name,
     last_name: user.name,
@@ -119,8 +124,10 @@ const handleOnlinePayment = async (
 
   const orderTotalInCents = Math.round(data.orderTotal * 100);
 
+  const paymobIntegrationId = getPaymobIntegrationId(paymentMethod);
+
   const paymentResult = await processPayment(
-    paymentMethod,
+    paymobIntegrationId,
     orderTotalInCents,
     billingData
   );
@@ -129,7 +136,6 @@ const handleOnlinePayment = async (
   }
   const order = await prisma.order.create({
     data: {
-      id: paymentResult.order_id,
       total: data.orderTotal,
       shippingAmount: data.shippingAmount,
       shippingLocation: data.shippingLocation,
@@ -171,7 +177,8 @@ const handleOnlinePayment = async (
 
   return {
     order,
-    clientSecret: paymentResult.client_secret,
+    paymentResult,
+    paymentLink: `https://accept.paymob.com/unifiedcheckout/?publicKey=${process.env.PAYMOB_PUBLIC_KEY}&clientSecret=${paymentResult.client_secret}`,
   };
 };
 
@@ -187,6 +194,7 @@ export const getOrders = async () => {
           },
         },
       },
+      shippingAddress: true,
     },
   });
 
@@ -208,6 +216,7 @@ export const getUserOrders = async (userId: string) => {
           },
         },
       },
+      shippingAddress: true,
     },
   });
 
@@ -229,6 +238,7 @@ export const getOrder = async (orderId: number) => {
           },
         },
       },
+      shippingAddress: true,
     },
   });
 
@@ -319,6 +329,7 @@ export const createOrder = async (
           priceAfterDiscount: Math.round(item.cartItemTotalPriceAfterDiscount),
         })),
       };
+
       const paymentData = await handleOnlinePayment(
         data.paymentMethod,
         cart.id,
