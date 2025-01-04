@@ -6,6 +6,7 @@ import {
   createProduct,
   updateProduct,
   uploadProductImages,
+  updateProductStock,
 } from "../controllers/productController";
 import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
 import { uploadMultipleImages } from "../middlewares/uploadImageMiddleware";
@@ -14,6 +15,7 @@ import {
   deleteProductValidation,
   getProductsValidation,
   updateProductValidation,
+  updateProductStockValidation,
 } from "../validations/productValidation";
 
 const router = Router();
@@ -33,6 +35,13 @@ router.post(
   authorizeRoles("ADMIN"),
   uploadMultipleImages([{ name: "files" }]),
   uploadProductImages
+);
+router.post(
+  "/update-stock",
+  updateProductStockValidation,
+  authenticateJWT,
+  authorizeRoles("ADMIN"),
+  updateProductStock
 );
 router.put(
   "/:id",

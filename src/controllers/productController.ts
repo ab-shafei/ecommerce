@@ -4,6 +4,7 @@ import {
   fetchAllProducts,
   fetchProductById,
   modifyProduct,
+  modifyProductStock,
   removeProduct,
   uploadImages,
 } from "../services/productService";
@@ -98,6 +99,21 @@ export const deleteProduct = async (
     const { id } = req.params;
     await removeProduct(id);
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProductStock = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { productId, inStock } = req.body;
+
+  try {
+    const product = await modifyProductStock(productId, inStock);
+    res.status(200).json({ message: "Stock updated successfully!", product });
   } catch (error) {
     next(error);
   }

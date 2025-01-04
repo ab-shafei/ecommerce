@@ -1,18 +1,19 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
+import { sendNotification } from "../utils/mail";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
-export const registerUser = async (
-  email: string,
-  password: string,
-  name: string,
-  phoneNumber: string
-) => {
+export const registerUser = async (data: {
+  email: string;
+  password: string;
+  name: string;
+  phoneNumber: string;
+}) => {
+  const { email, password, name, phoneNumber } = data;
   const existingUserByEmail = await prisma.user.findUnique({
     where: { email },
   });
@@ -81,28 +82,14 @@ export const forgetUserPassword = async (email: string) => {
     },
   });
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.GOOGLE_EMAIL,
-      pass: process.env.GOOGLE_EMAIL_PASSWORD,
-    },
-  });
-
   const mailOptions = {
-    from: process.env.EMAIL,
+    from: `"E-Commerce App" ${process.env.EMAIL}`,
     to: email,
     subject: "Password Reset",
     text: `You requested a password reset. Please use the following link to reset your password: ${process.env.CLIENT_URL}/reset-password/${resetToken}`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error(error);
-      throw new AppError(500, "Error sending email");
-    }
-    return "Password reset email sent";
-  });
+  sendNotification(mailOptions);
 };
 
 export const resetUserPassword = async (token: string, newPassword: string) => {

@@ -6,12 +6,7 @@ import {
   resetUserPassword,
   changePassword,
 } from "../services/authService";
-import {
-  validateEmail,
-  validateName,
-  validatePassword,
-  validatePhoneNumber,
-} from "../utils/validate";
+import { validatePassword } from "../utils/validate";
 import { AppError } from "../middlewares/AppError";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 
@@ -20,35 +15,8 @@ export const register = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { email, password, name, phoneNumber } = req.body;
-
-  if (!email || !password || !name || !phoneNumber) {
-    throw new AppError(400, "Missing required fields");
-  }
-
-  if (!validateEmail(email)) {
-    throw new AppError(400, "Invalid email format");
-  }
-
-  if (!validatePassword(password)) {
-    throw new AppError(
-      400,
-      "Password must be at least 8 characters long and include at least one letter and one number"
-    );
-  }
-
-  if (!validateName(name)) {
-    throw new AppError(400, "Name must be at least 2 characters long");
-  }
-
-  if (!validatePhoneNumber(phoneNumber)) {
-    throw new AppError(
-      400,
-      'Invalid phone number format. It should start with "+" and include 10-15 digits'
-    );
-  }
   try {
-    const user = await registerUser(email, password, name, phoneNumber);
+    const user = await registerUser(req.body);
     res.status(201).json(user);
   } catch (error) {
     next(error);

@@ -19,6 +19,7 @@ import layoutRoutes from "./routes/layoutRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import paymentRoutes from "./routes/paymentRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 
 import path from "path";
 import { notFound } from "./controllers/notFoundController";
@@ -58,6 +59,7 @@ app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
 app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1/layout", layoutRoutes);
+app.use("/api/v1/notifications", notificationRoutes);
 
 // Error Handling
 app.use(errorHandler);

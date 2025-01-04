@@ -6,6 +6,7 @@ import {
   GetProductsType,
   UpdateProductType,
 } from "../validations/schemas/productSchema";
+import { notifyUsers } from "./notificationService";
 
 export const fetchAllProducts = async (filter: GetProductsType) => {
   const { categoryName, color, size, inStock } = filter;
@@ -151,4 +152,25 @@ export const removeProduct = async (id: string) => {
     throw new AppError(404, "Product not found");
   }
   await prisma.product.delete({ where: { id } });
+};
+
+export const modifyProductStock = async (
+  productId: string,
+  inStock: boolean
+) => {
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+  });
+  if (!product) {
+    throw new AppError(404, "Product not found");
+  }
+  await prisma.product.update({
+    where: { id: productId },
+    data: { inStock },
+  });
+
+  // If the product was out of stock and is now available, trigger notifications
+  if (inStock) {
+    await notifyUsers(productId);
+  }
 };

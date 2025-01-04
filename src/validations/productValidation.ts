@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, query } from "express";
+import { Request, Response, NextFunction } from "express";
 import { parse } from "valibot";
 import { AppError } from "../middlewares/AppError";
 import {
@@ -6,6 +6,7 @@ import {
   DeleteProductRequestSchema,
   GetProductsRequestSchema,
   UpdateProductRequestSchema,
+  UpdateProductStockRequestSchema,
 } from "./schemas/productSchema";
 
 export async function getProductsValidation(
@@ -47,6 +48,22 @@ export async function updateProductValidation(
       body: req.body,
     });
     req.params = validatedData.params;
+    req.body = validatedData.body;
+    next();
+  } catch (error: any) {
+    next(new AppError(400, `Validation Error: ${error.message}`));
+  }
+}
+
+export async function updateProductStockValidation(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) {
+  try {
+    const validatedData = parse(UpdateProductStockRequestSchema, {
+      body: req.body,
+    });
     req.body = validatedData.body;
     next();
   } catch (error: any) {

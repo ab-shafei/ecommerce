@@ -85,6 +85,9 @@ export const addToCart = async (
   // Step 1: Check if the product exists and the size and color are available
   const product = await checkProductAvailability(productId, size, color);
 
+  if (!product.inStock) {
+    throw new AppError(400, "Not enough stock available for this product");
+  }
   // Step 2: Ensure the customer has a cart
   const cart = await ensureCart(customerId);
 
@@ -228,6 +231,11 @@ export const updateQuantity = async (
   if (!cartItem) {
     throw new AppError(404, "Cart item not found");
   }
+
+  if (!cartItem.product.inStock) {
+    throw new AppError(400, "Not enough stock available for this product");
+  }
+
   const productPrice = cartItem.product.price;
   const productPriceAfterDiscount = cartItem.product.priceAfterDiscount;
 

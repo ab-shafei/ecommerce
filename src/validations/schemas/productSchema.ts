@@ -8,7 +8,6 @@ import {
   InferInput,
   uuid,
   number,
-  check,
 } from "valibot";
 
 export const GetProductsSchema = object({
@@ -40,6 +39,11 @@ export const UpdateProductSchema = object({
   priceAfterDiscount: optional(number("Invalid priceAfterDiscount")),
 });
 
+export const UpdateProductStockSchema = object({
+  productId: string("Invalid productId"),
+  inStock: boolean("Invalid inStock"),
+});
+
 export const GetProductsRequestSchema = object({
   query: GetProductsSchema,
 });
@@ -55,6 +59,10 @@ export const UpdateProductRequestSchema = object({
   body: UpdateProductSchema,
 });
 
+export const UpdateProductStockRequestSchema = object({
+  body: UpdateProductStockSchema,
+});
+
 export const DeleteProductRequestSchema = object({
   params: object({
     id: pipe(string(), uuid()),
@@ -64,3 +72,6 @@ export const DeleteProductRequestSchema = object({
 export type GetProductsType = InferInput<typeof GetProductsSchema>;
 export type CreateProductType = InferInput<typeof CreateProductSchema>;
 export type UpdateProductType = InferInput<typeof UpdateProductSchema>;
+export type UpdateProductStockType = InferInput<
+  typeof UpdateProductStockSchema
+>;
