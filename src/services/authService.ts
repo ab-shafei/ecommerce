@@ -4,15 +4,11 @@ import crypto from "crypto";
 import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";
 import { sendNotification } from "../utils/mail";
+import { RegisterType } from "../validations/schemas/authSchema";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
-export const registerUser = async (data: {
-  email: string;
-  password: string;
-  name: string;
-  phoneNumber: string;
-}) => {
+export const registerUser = async (data: RegisterType) => {
   const { email, password, name, phoneNumber } = data;
   const existingUserByEmail = await prisma.user.findUnique({
     where: { email },

@@ -10,6 +10,8 @@ export const subscribeForNotification = async (
   const { id: userId } = req.user!;
   const { productId } = req.body;
 
+  console.log({ userId });
+
   try {
     // Check if the user is already subscribed
     const notification = await subscribe(userId, productId);

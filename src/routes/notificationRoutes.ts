@@ -9,7 +9,7 @@ router.post(
   "/subscribe",
   productSubscribeValidation,
   authenticateJWT,
-  authorizeRoles("ADMIN"),
+  authorizeRoles("CUSTOMER"),
   subscribeForNotification
 );
 
