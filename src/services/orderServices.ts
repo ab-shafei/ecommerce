@@ -177,7 +177,6 @@ const handleOnlinePayment = async (
 
   return {
     order,
-    paymentResult,
     paymentLink: `https://accept.paymob.com/unifiedcheckout/?publicKey=${process.env.PAYMOB_PUBLIC_KEY}&clientSecret=${paymentResult.client_secret}`,
   };
 };
