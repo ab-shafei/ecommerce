@@ -202,7 +202,9 @@ model Layout {
   id                 Int      @id @default(autoincrement())
   title              String?
   paragraph          String?
-  color               String?
+  color1               String?
+  color2               String?
+  color3               String?
   returnPolicy       String?
   privacyPolicy      String?
   termsAndConditions String?
