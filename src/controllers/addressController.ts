@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 
 import { AppError } from "../middlewares/AppError";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
-import { validatePhoneNumber } from "../utils/validate";
 import {
   addAddress,
   deleteAddress,
@@ -53,37 +52,8 @@ export const addUserAddress = async (
 ) => {
   const { id } = req.user!;
 
-  const {
-    name,
-    phoneNumber,
-    city,
-    region,
-    addressLine1,
-    addressLine2,
-    isDefault,
-  } = req.body;
-
   try {
-    if (!name || !phoneNumber || !city || !region || !addressLine1) {
-      throw new AppError(400, "Missing required fields");
-    }
-
-    if (!validatePhoneNumber(phoneNumber)) {
-      throw new AppError(
-        400,
-        'Invalid phone number format. It should start with "+" and include 10-15 digits'
-      );
-    }
-    const user = await addAddress({
-      userId: id,
-      name,
-      phoneNumber,
-      city,
-      region,
-      addressLine1,
-      addressLine2,
-      isDefault,
-    });
+    const user = await addAddress({ userId: id, ...req.body });
     res.status(201).json(user);
   } catch (error) {
     next(error);
@@ -97,15 +67,6 @@ export const updateUserAddress = async (
 ) => {
   const { id: userId } = req.user!;
   const { addressId } = req.params;
-  const {
-    name,
-    phoneNumber,
-    city,
-    region,
-    addressLine1,
-    addressLine2,
-    isDefault,
-  } = req.body;
 
   try {
     const convertedAddressId = parseInt(addressId, 10);
@@ -113,21 +74,7 @@ export const updateUserAddress = async (
       throw new AppError(400, "Invalid address ID");
     }
 
-    if (phoneNumber && !validatePhoneNumber(phoneNumber)) {
-      throw new AppError(
-        400,
-        'Invalid phone number format. It should start with "+" and include 10-15 digits'
-      );
-    }
-    const address = await updateAddress(userId, convertedAddressId, {
-      name,
-      phoneNumber,
-      city,
-      region,
-      addressLine1,
-      addressLine2,
-      isDefault,
-    });
+    const address = await updateAddress(userId, convertedAddressId, req.body);
     res.status(201).json(address);
   } catch (error) {
     next(error);

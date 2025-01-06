@@ -7,6 +7,10 @@ import {
   updateUserAddress,
 } from "../controllers/addressController";
 import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
+import {
+  addAddressValidation,
+  updateAddressValidation,
+} from "../validations/addressValidation";
 
 const router = Router();
 
@@ -18,16 +22,23 @@ router.get(
 );
 
 router.get(
-  "/:id",
+  "/:addressId",
   authenticateJWT,
   authorizeRoles("CUSTOMER"),
   getLoggedUserAddressById
 );
 
-router.post("/", authenticateJWT, authorizeRoles("CUSTOMER"), addUserAddress);
+router.post(
+  "/",
+  addAddressValidation,
+  authenticateJWT,
+  authorizeRoles("CUSTOMER"),
+  addUserAddress
+);
 
 router.put(
   "/:addressId",
+  updateAddressValidation,
   authenticateJWT,
   authorizeRoles("CUSTOMER"),
   updateUserAddress
