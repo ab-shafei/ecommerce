@@ -14,6 +14,7 @@ export const ChangeLayoutSchema = object({
   color1: optional(string()),
   color2: optional(string()),
   color3: optional(string()),
+  color4: optional(string()),
   returnPolicy: optional(string()),
   privacyPolicy: optional(string()),
   termsAndConditions: optional(string()),

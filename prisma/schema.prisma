@@ -205,6 +205,7 @@ model Layout {
   color1               String?
   color2               String?
   color3               String?
+  color4               String?
   returnPolicy       String?
   privacyPolicy      String?
   termsAndConditions String?
