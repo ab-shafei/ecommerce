@@ -5,7 +5,8 @@ import { AuthenticatedRequest } from "../middlewares/authMiddleware";
 import {
   getLayout,
   changeLayout,
-  changeImagesOfLayout,
+  addBannerImage,
+  deleteBannerImage,
 } from "../services/layoutService";
 
 export const getWebsiteLayout = async (
@@ -34,7 +35,7 @@ export const changeWebsiteLayout = async (
   }
 };
 
-export const changeImagesOFWebsiteLayout = async (
+export const addBannerImageToLayout = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -46,8 +47,26 @@ export const changeImagesOFWebsiteLayout = async (
     if (!files) {
       throw new AppError(400, "Please upload files");
     }
-    const address = await changeImagesOfLayout(files);
+    const address = await addBannerImage(req.body.categoryId, files);
     res.status(200).json(address);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteBannerImageFromLayout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const convertedBannerImageId = parseInt(req.params.id, 10);
+    if (isNaN(convertedBannerImageId)) {
+      throw new AppError(400, "Invalid bannerImage ID");
+    }
+
+    const bannerImage = await deleteBannerImage(convertedBannerImageId);
+    res.status(200).json(bannerImage);
   } catch (error) {
     next(error);
   }

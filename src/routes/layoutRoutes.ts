@@ -2,7 +2,8 @@ import { Router } from "express";
 import {
   getWebsiteLayout,
   changeWebsiteLayout,
-  changeImagesOFWebsiteLayout,
+  addBannerImageToLayout,
+  deleteBannerImageFromLayout,
 } from "../controllers/layoutController";
 import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
 import { uploadMultipleImages } from "../middlewares/uploadImageMiddleware";
@@ -25,7 +26,14 @@ router.post(
   authenticateJWT,
   authorizeRoles("ADMIN"),
   uploadMultipleImages([{ name: "files" }]),
-  changeImagesOFWebsiteLayout
+  addBannerImageToLayout
+);
+
+router.delete(
+  "/images/:id",
+  authenticateJWT,
+  authorizeRoles("ADMIN"),
+  deleteBannerImageFromLayout
 );
 
 export default router;

@@ -22,11 +22,10 @@ model User {
   cart        Cart[]
   order       Order[]
   couponUsage CouponUsage[]
-  review Review[]
+  review      Review[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 
   productNotification ProductNotification[]
 }
@@ -77,53 +76,51 @@ model Product {
 
   cartItem  CartItem[]
   orderItem OrderItem[]
-  review Review[]
+  review    Review[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 
   productNotification ProductNotification[]
 }
 
 model ProductNotification {
-  id         Int      @id @default(autoincrement())
-  userId     String
-  productId  String
-  notified   Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    String
+  productId String
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user       User     @relation(fields: [userId], references: [id])
-  product    Product  @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
 
-
 model Cart {
-  id                          Int     @id @default(autoincrement())
-  cartTotalPrice              Float @default(0)
-  cartTotalPriceAfterDiscount Float @default(0)
+  id                          Int        @id @default(autoincrement())
+  cartTotalPrice              Float      @default(0)
+  cartTotalPriceAfterDiscount Float      @default(0)
   couponId                    Int?
   discount                    Float?
-  customerId String     @unique
-  customer   User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  items      CartItem[]
+  customerId                  String     @unique
+  customer                    User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items                       CartItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model CartItem {
-  id                 Int     @id @default(autoincrement())
-  quantity           Int   
-  color              String
-  size               String
-  cartItemTotalPrice Float
+  id                              Int    @id @default(autoincrement())
+  quantity                        Int
+  color                           String
+  size                            String
+  cartItemTotalPrice              Float
   cartItemTotalPriceAfterDiscount Float
 
   cartId    Int
   cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  productId String 
+  productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
@@ -142,28 +139,28 @@ model Order {
   trackingNumber    String?
   estimatedDelivery DateTime?
   deliveredAt       DateTime?
-  customerId        String       
+  customerId        String
   shippingAddressId Int
   paymentIntentId   String?
-  payMobOrderId     Int?      @unique
-  customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  shippingAddress Address     @relation(fields: [shippingAddressId], references: [id])
-  items           OrderItem[]
+  payMobOrderId     Int?          @unique
+  customer          User          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  shippingAddress   Address       @relation(fields: [shippingAddressId], references: [id])
+  items             OrderItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model OrderItem {
-  id        Int     @id @default(autoincrement())
-  name      String
-  quantity  Int
-  color     String
-  size      String
-  price     Float
+  id                 Int    @id @default(autoincrement())
+  name               String
+  quantity           Int
+  color              String
+  size               String
+  price              Float
   priceAfterDiscount Float
-  productId String 
-  orderId   Int
+  productId          String
+  orderId            Int
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -199,50 +196,41 @@ model CouponUsage {
 }
 
 model Layout {
-  id                 Int      @id @default(autoincrement())
+  id                 Int           @id @default(autoincrement())
   title              String?
   paragraph          String?
-  color1               String?
-  color2               String?
-  color3               String?
-  color4               String?
+  color1             String?
+  color2             String?
+  color3             String?
+  color4             String?
   returnPolicy       String?
   privacyPolicy      String?
   termsAndConditions String?
   aboutUs            String?
   contactEmail       String?
   contactPhoneNumber String?
-  images             String[]
+  images             BannerImage[]
 }
 
-// model Payment {
-//   id            Int           @id @default(autoincrement())
-//   amount        Float
-//   currency      String
-//   paymentMethod PaymentMethod
-//   status        OrderStatus
-//   customerId    String
-//   orderId       Int
-//   paymentIntentId String
-//   payMobOrderId   Int
+model BannerImage {
+  id         Int      @id @default(autoincrement())
+  categoryId String
+  image      String[]
 
-//   customer User  @relation(fields: [customerId], references: [id])
-//   order   Order @relation(fields: [orderId], references: [id])
-
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+  layoutId Int
+  layout   Layout @relation(fields: [layoutId], references: [id])
+}
 
 model Review {
-  id        Int      @id @default(autoincrement())
-  rating    Int     
+  id        Int          @id @default(autoincrement())
+  rating    Int
   comment   String?
   status    ReviewStatus @default(PENDING)
   productId String
   userId    String
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
