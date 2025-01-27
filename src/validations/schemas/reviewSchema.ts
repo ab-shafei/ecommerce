@@ -20,7 +20,7 @@ export const AddReviewSchema = object({
 });
 
 export const UpdateReviewSchema = object({
-  reviewId: string("Invalid Review ID"),
+  reviewId: number("Invalid Review ID"),
   status: venum(
     ReviewStatus,
     "Invalid Review Status Value (APPROVED | REJECTED)"

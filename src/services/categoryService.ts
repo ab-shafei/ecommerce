@@ -46,11 +46,7 @@ export const uploadImages = async ({
   }
   switch (uploadType) {
     case "images":
-      const { imageURLs } = await resizeAndSaveImages(
-        "category",
-        "category",
-        files
-      );
+      const { imageURLs } = await resizeAndSaveImages("category", files);
       return await prisma.category.update({
         where: { id },
         data: { images: imageURLs },

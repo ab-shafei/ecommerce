@@ -1,10 +1,24 @@
 import { NextFunction, Request, Response } from "express";
 import {
   addReview,
-  getReviews,
+  getAllProductReviews,
+  getAllReviews,
   moderateReview,
 } from "../services/reviewService";
 import { AuthenticatedRequest } from "../middlewares/authMiddleware";
+
+export const getReviews = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const reviews = await getAllReviews();
+    res.status(200).json(reviews);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getProductReviews = async (
   req: Request,
@@ -14,7 +28,7 @@ export const getProductReviews = async (
   const { productId } = req.query;
 
   try {
-    const reviews = await getReviews(productId as string);
+    const reviews = await getAllProductReviews(productId as string);
     res.status(200).json(reviews);
   } catch (error) {
     next(error);

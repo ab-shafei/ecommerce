@@ -31,7 +31,7 @@ export const addBannerImage = async (
   categoryId: string,
   files: Express.Multer.File[]
 ) => {
-  const { imageURLs } = await resizeAndSaveImages("layout", "layout", files);
+  const { imageURLs } = await resizeAndSaveImages("layout", files);
 
   const category = await prisma.category.findUnique({
     where: {

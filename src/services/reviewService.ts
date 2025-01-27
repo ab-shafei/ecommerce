@@ -74,7 +74,21 @@ export const moderateReview = async ({
   };
 };
 
-export const getReviews = async (productId: string) => {
+export const getAllReviews = async () => {
+  const reviews = await prisma.review.findMany({
+    include: {
+      user: {
+        select: { name: true }, // Show the reviewer's name
+      },
+    },
+  });
+
+  return {
+    reviews,
+  };
+};
+
+export const getAllProductReviews = async (productId: string) => {
   const reviews = await prisma.review.findMany({
     where: {
       productId,

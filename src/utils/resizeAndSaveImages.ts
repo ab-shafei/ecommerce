@@ -1,34 +1,48 @@
-import fs from "fs";
-import path from "path";
 import sharp from "sharp";
-import { v4 as uuidv4 } from "uuid";
-
-const SERVER_URL = process.env.SERVER_URL;
-
-export type ImageType = "product" | "category" | "layout";
+import { supabase } from "./supabase";
+import unique from "uniqid";
 
 export default async function resizeAndSaveImages(
-  imagePrefix: string,
-  type: ImageType,
+  prefix: string,
   files: Express.Multer.File[]
 ) {
   const imageURLs: string[] = [];
-  const uploadDir = path.join(__dirname, `../../uploads/${type}`);
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-  await Promise.all(
-    files.map(async (img, index) => {
-      const imageName = `${imagePrefix}-${uuidv4()}-${Date.now()}-${
-        index + 1
-      }.jpeg`;
 
-      await sharp(img.buffer)
+  await Promise.all(
+    files.map(async (file, index) => {
+      // Resize the image using sharp
+      const buffer = await sharp(file.buffer)
         .toFormat("jpeg")
         .jpeg({ quality: 95 })
-        .toFile(`uploads/${type}/${imageName}`);
+        .toBuffer();
 
-      imageURLs.push(`${SERVER_URL}/api/v1/images/${type}/${imageName}`);
+      // Upload to Supabase storage
+      const uniqueID = unique(prefix);
+      const filePath = `${uniqueID}.jpeg`;
+      const { error } = await supabase.storage
+        .from("images") // Replace with your bucket name
+        .upload(`${filePath}`, buffer, {
+          contentType: "image/jpeg",
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (error) {
+        console.error("Error uploading file to Supabase:", error);
+        throw new Error("Failed to upload file");
+      }
+
+      const { data } = supabase.storage
+        .from("images")
+        .getPublicUrl(`${filePath}`);
+
+      console.log(data);
+
+      if (!data) {
+        throw new Error("Failed to upload file");
+      }
+
+      imageURLs.push(data.publicURL);
     })
   );
 

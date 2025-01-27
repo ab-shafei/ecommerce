@@ -1,4 +1,3 @@
-import { PaymentMethod } from "@prisma/client";
 import axios from "axios";
 import prisma from "../utils/prismaClient";
 import { AppError } from "../middlewares/AppError";

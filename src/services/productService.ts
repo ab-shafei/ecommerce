@@ -96,19 +96,14 @@ export const uploadImages = async ({
   }
   switch (uploadType) {
     case "images":
-      const { imageURLs } = await resizeAndSaveImages(
-        "product",
-        "product",
-        files
-      );
+      const { imageURLs } = await resizeAndSaveImages("product", files);
       return await prisma.product.update({
         where: { id },
         data: { images: imageURLs },
       });
     case "dimensionsImages":
       const { imageURLs: dimensionsImages } = await resizeAndSaveImages(
-        "product-dimensions",
-        "product",
+        "product-dimension",
         files
       );
       return await prisma.product.update({

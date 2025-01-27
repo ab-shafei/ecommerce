@@ -3,6 +3,7 @@ import {
   getProductReviews,
   addProductReview,
   moderateProductReview,
+  getReviews,
 } from "../controllers/reviewController";
 import {
   addReviewValidation,
@@ -12,6 +13,7 @@ import { authenticateJWT, authorizeRoles } from "../middlewares/authMiddleware";
 
 const router = Router();
 
+router.get("/all", authenticateJWT, authorizeRoles("ADMIN"), getReviews);
 router.get("/", getProductReviews);
 router.post(
   "/",
@@ -22,7 +24,7 @@ router.post(
 );
 router.put(
   "/moderate",
-  addReviewValidation,
+  updateReviewValidation,
   authenticateJWT,
   authorizeRoles("ADMIN"),
   updateReviewValidation,

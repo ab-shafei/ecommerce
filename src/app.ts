@@ -41,7 +41,7 @@ app.use(morgan("combined"));
 
 // welcoming
 app.get("/", (_req: Request, res: Response) => {
-  res.status(200).send("Welcome to taline api");
+  res.status(200).send("Welcome to e-commerce api");
 });
 
 // Authentication routes
